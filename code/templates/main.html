@@ -83,8 +83,8 @@
                 g1.selectAll(".pin").data(data[key]).enter().append("circle")
                     .attr("class", "datapoint")
                     .attr("r", 4)
-                    .attr("fill", color)
-                    .attr("fill-opacity", "1")
+                    .attr("fill", "red")
+                    .attr("fill-opacity", "0.01")
                     .attr("transform", function (d) {
                         return "translate(" + gfg([d["lon"], d["lat"]]) + ")";
                     });
