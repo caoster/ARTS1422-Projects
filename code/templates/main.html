@@ -94,6 +94,64 @@
     console.log(gfg.invert([1000, 800]));
     console.log(gfg.invert([-1000, -800]));
 
+    // para axis
+    svg2 = d3.select("body")
+        .append("svg")
+        .attr("width", 1100)
+        .attr("height", 1800);
+    d3.json("../data/fire_mul.json",function(data){
+        // for (let i = 0; i < data.length; i++) {
+        //     data[i].month = parseFloat(data[i].month)
+        //     data[i].population = parseFloat(data[i].population)
+        // }
+        data = data.features
+        var population_range = [d3.min(data,function(d){   
+                return d.population;}),
+            d3.max(data,function(d){   
+                return d.population;})
+        ];
+
+        var scale1 = d3.scaleLinear()
+            .domain([1,12])
+            .range([480,0]);
+        var scale1_r = d3.scaleLinear()
+            .domain([1,365])
+            .range([520,0]);
+        var axis1 = d3.axisLeft(scale1);
+        svg2.append("g")
+            .attr("transform","translate("+100+","+200+")")
+            .call(axis1);
+
+        var scale2 = d3.scaleLinear()
+            .domain([2007,2020])
+            .range([520,0]);
+        var axis2 = d3.axisLeft(scale2);
+        svg2.append("g")
+            .attr("transform","translate("+300+","+200+")")
+            .call(axis2);
+        
+        var scale3 = d3.scaleLinear()
+            .domain(population_range)
+            .range([520,0]);
+        var axis3 = d3.axisLeft(scale3);
+        svg2.append("g")
+            .attr("transform","translate("+500+","+200+")")
+            .call(axis3);
+
+        var color = d3.color("blue");
+        color.opacity = 0.07
+        svg2.selectAll(".paracool").data(data).enter()
+            .append("line")
+            .attr("class", "paracool")
+            .attr("x1",100)
+            .attr("x2",300)
+            .attr("y1",(d) => scale1_r(d.day)+200)
+            .attr("y2",(d) => scale2(d.year)+200)
+            .attr("stroke",color)
+            .attr("stroke-width", "0.1")
+            // .attr("fill-opacity", "0.1")
+    })
+
     let zoom = d3.zoom()
         .scaleExtent([1, 15])
         .translateExtent([[-width / 2, -height / 2], [width * 3 / 2, height * 3 / 2]])
