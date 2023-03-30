@@ -1,7 +1,39 @@
-# -*- coding: UTF-8 -*-
-
+# !! xlrd version=1.2.0 needed
 import numpy as np
 import pandas as pd
+
+file_population_density = np.load("data\\population_density.npy")
+# file_regional_industry = np.load("data\\regional_industry.npy")
+# file_weather = np.load("data\\weather.npy")
+file_fire = pd.read_excel("data\\fire.xlsx")
+grids = {}
+
+def time_to_month(time):
+    return (time.year - 2007)*12 + time.month
+
+# UGLY
+def get_grid_id(lat,lng,grids):
+    near_key = None 
+    lats = list(grids.keys())
+    lats.sort()
+    for i in lats:
+        if lat < i:
+            near_key = i
+            break
+    if not near_key or near_key - lat > 0.03:
+        raise ValueError
+    
+    near_key2 = None
+    lngs = list(grids[near_key].keys())
+    lngs.sort()
+    for i in lngs:
+        if lng < i:
+            near_key2 = i
+            break
+    if not near_key2 or near_key2 - lng > 0.03:
+        raise ValueError
+    
+    return grids[near_key][near_key2]
 
 class Fire:
     fire_types = []
@@ -11,6 +43,12 @@ class Fire:
         self.time = event[1]
         self.lat = event[5]
         self.lng = event[6]
+        self.population = None
+        try:
+            self.grid = get_grid_id(self.lat, self.lng, grids)
+            self.population = file_population_density[time_to_month(self.time)][self.grid][2]
+        except:
+            self.grid = None
 
         # encode type, avoid Chinese
         if event[2] in Fire.fire_types:
@@ -43,10 +81,11 @@ class Fire:
             str(self.time.year)+","+str(self.time.month)+","+str(self.time.dayofweek)+","+str(self.time.hour)+"\n"
         
 
-# file_population_density = np.load("data\\population_density.npy")
-# file_regional_industry = np.load("data\\regional_industry.npy")
-# file_weather = np.load("data\\weather.npy")
-file_fire = pd.read_excel("data\\fire.xlsx")
+for i in range(len(file_population_density[0])):
+    if file_population_density[0][i][0] in grids.keys():
+        grids[file_population_density[0][i][0]][file_population_density[0][i][1]] = i
+    else:
+        grids[file_population_density[0][i][0]] = {file_population_density[0][i][1]: i}
 
 fires = {}
 
