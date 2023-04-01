@@ -6,7 +6,7 @@ import json
 
 file_population_density = np.load("data/population_density.npy")
 # file_regional_industry = np.load("data/regional_industry.npy")
-# file_weather = np.load("data/weather.npy")
+file_weather = np.load("data/weather.npy")
 file_fire = pd.read_excel("data/fire.xlsx")
 grids = {}
 fire_types = []
@@ -79,7 +79,7 @@ class Fire:
     
     def js(self):
         # id, type, main_station, support_station, lat, lng, year, month, day_of_week, hour, waiting to add......
-        return {"id":self.id, "type":self.type, "day":self.time.dayofyear, "population":self.population, "year":self.time.year}
+        return {"id":self.id, "type":self.type, "day":self.time.dayofyear, "population":self.population, "year":self.time.year, "main_station":self.main_station, "temp":file_weather[time_to_month(self.time)][self.grid][3], "rain":file_weather[time_to_month(self.time)][self.grid][7]}
 
 for i in range(len(file_population_density[0])):
     if file_population_density[0][i][0] in grids.keys():
@@ -99,9 +99,11 @@ for event in file_fire.values:
 for i in range(len(fire_types)):
     print(i, fire_types[i])
 
+print(len(fires))
+
 file = {"type": "FeatureCollection", "features": []}
 for i in fires.values():
-    if i.population != -1:
+    if i.grid != None:
         file["features"].append(i.js())
 
 with open("code\\data\\fire_mul.json", "w") as outfile:

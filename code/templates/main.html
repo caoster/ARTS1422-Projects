@@ -94,62 +94,117 @@
     console.log(gfg.invert([1000, 800]));
     console.log(gfg.invert([-1000, -800]));
 
-    // para axis
+    // para coor
+    var dimensions = [(d)=>d.year, (d)=>d.day, (d)=>d.rain, (d)=>d.temp]
+    var domains = [[2020,2007], [366,1], [0,550],[0,35]]
+    var txts = ["year", "month", "temperature", "rain"]
+    var scale_pc = []
+    var axis_pc = []
+    var a,s
+    var color = d3.color("blue");
+    color.opacity = 0.07
+
     svg2 = d3.select("body")
         .append("svg")
         .attr("width", 1100)
         .attr("height", 1800);
+
     d3.json("../data/fire_mul.json",function(data){
-        // for (let i = 0; i < data.length; i++) {
-        //     data[i].month = parseFloat(data[i].month)
-        //     data[i].population = parseFloat(data[i].population)
-        // }
         data = data.features
-        var population_range = [d3.min(data,function(d){   
-                return d.population;}),
-            d3.max(data,function(d){   
-                return d.population;})
-        ];
+        // var population_range = [d3.min(data,function(d){   
+        //         return d.population;}),
+        //     d3.max(data,function(d){   
+        //         return d.population;})
+        // ];
 
-        var scale1 = d3.scaleLinear()
-            .domain([1,12])
-            .range([480,0]);
-        var scale1_r = d3.scaleLinear()
-            .domain([1,365])
-            .range([520,0]);
-        var axis1 = d3.axisLeft(scale1);
-        svg2.append("g")
-            .attr("transform","translate("+100+","+200+")")
-            .call(axis1);
+        for (let a = 0; a < dimensions.length; a++) {
+            // if (txts[a]=="station"){
+            //     s = d3.scaleBand()
+            //         .domain("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP")
+            //         .range([0,480])
+            //         .paddingInner(1);
+            //     console.log(s('f'))
+            //     scale_pc.push(s);
+            // }else{
+            s = d3.scaleLinear()
+                .domain(domains[a])
+                .range([480,0]);
+            scale_pc.push(s);
+            // }
 
-        var scale2 = d3.scaleLinear()
-            .domain([2007,2020])
-            .range([520,0]);
-        var axis2 = d3.axisLeft(scale2);
-        svg2.append("g")
-            .attr("transform","translate("+300+","+200+")")
-            .call(axis2);
+            if (txts[a]=="month"){
+                s = d3.scaleBand()
+                    .domain(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", " "])
+                    .range([0,480])
+                    .paddingInner(1);
+            }
+            ax = d3.axisLeft(s);
+            svg2.append("g")
+                .attr("transform",`translate(${a*150 + 150},200)`)
+                .call(ax);
+            
+            if (a > 0) {
+                svg2.selectAll(".pc"+a).data(data).enter()
+                    .append("line")
+                    .attr("class", "pc"+a)
+                    .attr("x1",150*a)
+                    .attr("x2",150*(1+a))
+                    .attr("y1",(d) => scale_pc[a-1](dimensions[a-1](d))+200)
+                    .attr("y2",(d) => scale_pc[a](dimensions[a](d))+200)
+                    .attr("stroke",color)
+                    .attr("stroke-width", "0.1")
+            }
+
+        }
+
+        // var scale1 = d3.scaleLinear()
+        //     .domain([1,12])
+        //     .range([440,0]);
+        // var scale1_r = d3.scaleLinear()
+        //     .domain([1,365])
+        //     .range([480,0]);
+        // var axis1 = d3.axisLeft(scale1);
+        // svg2.append("g")
+        //     .attr("transform","translate("+100+","+200+")")
+        //     .call(axis1);
+
+        // var scale2 = d3.scaleLinear()
+        //     .domain([2007,2020])
+        //     .range([480,0]);
+        // var axis2 = d3.axisLeft(scale2);
+        // svg2.append("g")
+        //     .attr("transform","translate("+300+","+200+")")
+        //     .call(axis2);
         
-        var scale3 = d3.scaleLinear()
-            .domain(population_range)
-            .range([520,0]);
-        var axis3 = d3.axisLeft(scale3);
-        svg2.append("g")
-            .attr("transform","translate("+500+","+200+")")
-            .call(axis3);
+        // var scale3 = d3.scaleLinear()
+        //     .domain(population_range)
+        //     .range([480,0]);
+        // var axis3 = d3.axisLeft(scale3);
+        // svg2.append("g")
+        //     .attr("transform","translate("+500+","+200+")")
+        //     .call(axis3);
 
-        var color = d3.color("blue");
-        color.opacity = 0.07
-        svg2.selectAll(".paracool").data(data).enter()
-            .append("line")
-            .attr("class", "paracool")
-            .attr("x1",100)
-            .attr("x2",300)
-            .attr("y1",(d) => scale1_r(d.day)+200)
-            .attr("y2",(d) => scale2(d.year)+200)
-            .attr("stroke",color)
-            .attr("stroke-width", "0.1")
-            // .attr("fill-opacity", "0.1")
+        
+        // svg2.selectAll(".pc1").data(data).enter()
+        //     .append("line")
+        //     .attr("class", "pc1")
+        //     .attr("x1",100)
+        //     .attr("x2",300)
+        //     .attr("y1",(d) => scale1_r(d.day)+200)
+        //     .attr("y2",(d) => scale2(dems[0](d))+200)
+        //     .attr("stroke",color)
+        //     .attr("stroke-width", "0.1")
+        
+        // svg2.selectAll(".pc2").data(data).enter()
+        //     .append("line")
+        //     .attr("class", "pc2")
+        //     .attr("x1",500)
+        //     .attr("x2",300)
+        //     .attr("y1",(d) => scale3(d.population)+200)
+        //     .attr("y2",(d) => scale2(d.year)+200)
+        //     .attr("stroke",color)
+        //     .attr("stroke-width", "0.1")
+
     })
 
     let zoom = d3.zoom()
