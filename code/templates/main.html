@@ -95,14 +95,17 @@
     console.log(gfg.invert([-1000, -800]));
 
     // para coor
-    var dimensions = [(d)=>d.year, (d)=>d.day, (d)=>d.rain, (d)=>d.temp]
-    var domains = [[2020,2007], [366,1], [0,550],[0,35]]
-    var txts = ["year", "month", "temperature", "rain"]
-    var scale_pc = []
-    var axis_pc = []
-    var a,s
-    var color = d3.color("blue");
-    color.opacity = 0.07
+    var dimensions = [(d)=>d.year, (d)=>d.day, (d)=>d.rain, (d)=>d.temp];
+    var domains = [[2020,2007], [366,1], [0,550],[0,40]];
+    var txts = ["year", "month", "rain", "temperature"];
+    var scale_pc = [];
+    var axis_pc = [];
+    var a,s;
+    var color_normal = d3.color("blue");
+    color_normal.opacity = 0.07;
+    var color_highlight = d3.color("red");
+    var color_lowlight = d3.color("blue");
+    color_lowlight.opacity = 0.03;
 
     svg2 = d3.select("body")
         .append("svg")
@@ -143,6 +146,11 @@
                 .attr("transform",`translate(${a*150 + 150},200)`)
                 .call(ax);
             
+            svg2.append("text")
+                .attr("transform", `translate(${a*150 + 140},700)`)
+                .attr("font-size", "15px")
+                .text(txts[a]);
+            
             if (a > 0) {
                 svg2.selectAll(".pc"+a).data(data).enter()
                     .append("line")
@@ -151,59 +159,56 @@
                     .attr("x2",150*(1+a))
                     .attr("y1",(d) => scale_pc[a-1](dimensions[a-1](d))+200)
                     .attr("y2",(d) => scale_pc[a](dimensions[a](d))+200)
-                    .attr("stroke",color)
+                    .attr("stroke",color_normal)
                     .attr("stroke-width", "0.1")
             }
 
         }
 
-        // var scale1 = d3.scaleLinear()
-        //     .domain([1,12])
-        //     .range([440,0]);
-        // var scale1_r = d3.scaleLinear()
-        //     .domain([1,365])
-        //     .range([480,0]);
-        // var axis1 = d3.axisLeft(scale1);
-        // svg2.append("g")
-        //     .attr("transform","translate("+100+","+200+")")
-        //     .call(axis1);
+        // select by brush
+        var bruchGroup = svg2.append('g')
+                        .attr('class', 'brush')
+                        .call(d3.brush().on('end', function(d){
+            area = d3.brushSelection(this)
+            if (area != null){
+            // console.log(area)
+            var xmin = d3.min([area[0][0], area[1][0]])
+            var xmax = d3.max([area[0][0], area[1][0]])
+            var ymin = d3.min([area[0][1], area[1][1]])
+            var ymax = d3.max([area[0][1], area[1][1]])
+            // console.log(xmin, xmax, ymin, ymax)
 
-        // var scale2 = d3.scaleLinear()
-        //     .domain([2007,2020])
-        //     .range([480,0]);
-        // var axis2 = d3.axisLeft(scale2);
-        // svg2.append("g")
-        //     .attr("transform","translate("+300+","+200+")")
-        //     .call(axis2);
-        
-        // var scale3 = d3.scaleLinear()
-        //     .domain(population_range)
-        //     .range([480,0]);
-        // var axis3 = d3.axisLeft(scale3);
-        // svg2.append("g")
-        //     .attr("transform","translate("+500+","+200+")")
-        //     .call(axis3);
+            selected = []
+            for (let a = 0; a < dimensions.length; a++){
+                svg2.selectAll(".pc"+a).attr("stroke", function(d){
+                    if ((this.x1.baseVal.value <= xmax && this.x1.baseVal.value >= xmin && this.y1.baseVal.value <= ymax && this.y1.baseVal.value >= ymin)||(this.x2.baseVal.value <= xmax && this.x2.baseVal.value >= xmin && this.y2.baseVal.value <= ymax && this.y2.baseVal.value >= ymin)){
+                        selected.push(d.id)
+                    }
+                    return color_normal
+                })
+            }
+        }else{
+            selected = [];
+        }
+        console.log(selected.length);
 
-        
-        // svg2.selectAll(".pc1").data(data).enter()
-        //     .append("line")
-        //     .attr("class", "pc1")
-        //     .attr("x1",100)
-        //     .attr("x2",300)
-        //     .attr("y1",(d) => scale1_r(d.day)+200)
-        //     .attr("y2",(d) => scale2(dems[0](d))+200)
-        //     .attr("stroke",color)
-        //     .attr("stroke-width", "0.1")
-        
-        // svg2.selectAll(".pc2").data(data).enter()
-        //     .append("line")
-        //     .attr("class", "pc2")
-        //     .attr("x1",500)
-        //     .attr("x2",300)
-        //     .attr("y1",(d) => scale3(d.population)+200)
-        //     .attr("y2",(d) => scale2(d.year)+200)
-        //     .attr("stroke",color)
-        //     .attr("stroke-width", "0.1")
+        // recolor
+        for (let a = 0; a < dimensions.length; a++){
+            svg2.selectAll(".pc"+a).attr("stroke", function(d){
+                if (selected.length == 0){
+                    return color_normal
+                }else{
+                    for (let i = 0; i < selected.length; i++) {
+                        if (d.id == selected[i]){
+                            return color_highlight
+                        }
+                    }
+                    return color_lowlight
+                }
+            })
+        }
+
+    }))
 
     })
 
