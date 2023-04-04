@@ -95,9 +95,6 @@
     console.log(gfg.invert([-1000, -800]));
 
     // para coor
-    var dimensions = [(d)=>d.year, (d)=>d.day, (d)=>d.rain, (d)=>d.temp];
-    var domains = [[2020,2007], [366,1], [0,550],[0,40]];
-    var txts = ["year", "month", "rain", "temperature"];
     var scale_pc = [];
     var axis_pc = [];
     var a,s;
@@ -113,27 +110,19 @@
         .attr("height", 1800);
 
     d3.json("../data/fire_mul.json",function(data){
+        console.log(data)
+        // var dt = data.distr
         data = data.features
-        // var population_range = [d3.min(data,function(d){   
-        //         return d.population;}),
-        //     d3.max(data,function(d){   
-        //         return d.population;})
-        // ];
+        
+        var dimensions = [(d)=>d.year, (d)=>d.population, (d)=>d.hour, (d)=>d.day, (d)=>d.rain, (d)=>d.temp];
+        var txts = ["year", "population", "hour", "month", "rain", "temperature"];
+        var domains = [[2007,2020], [1,5], [0,24], [366,1], [0,550], [0,40]];
 
         for (let a = 0; a < dimensions.length; a++) {
-            // if (txts[a]=="station"){
-            //     s = d3.scaleBand()
-            //         .domain("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP")
-            //         .range([0,480])
-            //         .paddingInner(1);
-            //     console.log(s('f'))
-            //     scale_pc.push(s);
-            // }else{
             s = d3.scaleLinear()
                 .domain(domains[a])
                 .range([480,0]);
             scale_pc.push(s);
-            // }
 
             if (txts[a]=="month"){
                 s = d3.scaleBand()
