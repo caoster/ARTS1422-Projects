@@ -13,6 +13,9 @@
 <script src="https://d3js.org/d3.v4.js"></script>
 <script src="https://d3js.org/d3-geo-projection.v3.min.js"></script>
 <script>
+    let pic_width = 8704;
+    let pic_height = 6912;
+
     function getColor() {
         if (!('count' in getColor))
             getColor.count = 0;
@@ -33,7 +36,8 @@
         .geoMercator()
         .scale(width * 20)
         .rotate([0, 0])
-        .center([119.5, 29.9])
+        .center([119.55391690035734, 29.860715859217756])
+        // .center([119.5, 29.9])
         .translate([0, 0]);
 
     g = svg.append("g")
@@ -42,17 +46,32 @@
             d3.select("h1").text(`${coord[0].toFixed(3)}, ${coord[1].toFixed(3)}`);
         });
 
+    function population_interpolate(density) {
+        let min_density = 0.1028831228613853;
+        let max_density = 17573.560546875;
+        return d3.interpolateRgb("red", "green")((density - min_density) / (max_density - min_density));
+    }
+
+    let month_sel = 157;
+    // 30.502, 119.484
+    //29.860715859217756, 119.55391690035734
+    // 31.902032349786307, 122.52776861236988
+    // 27.8193993686492, 116.5800651883448
+
     d3.json(
         "../data/geojson.json",
         function (data) {
             g.append("image")
                 .attr('id', 'map')
                 .attr("xlink:href", "map.jpg")
-                .attr("transform", `translate(${-width},${-height}) scale(0.5)`);
+                .attr("transform", `translate(${-pic_width / 2},${-pic_height / 2}) scale(1)`);
 
             g.selectAll("path").data(data.features).enter().append("path") /* data.features to fill */
-                .attr("fill", "#FFFFFF")
-                .attr("fill-opacity", "0.2")
+                // `${population_interpolate(data.features.properties["population_density"][month_sel])}`
+                .attr("fill", function (d) {
+                    return population_interpolate(d.properties.population_density[month_sel]);
+                })
+                .attr("fill-opacity", "0.4")
                 .attr("d", d3.geoPath().projection(gfg))
                 .style("stroke", "#000000")
                 .style("stroke-width", "0.3px");
@@ -74,22 +93,22 @@
     g1 = svg.append("g")
         .attr("transform", `translate(${x_move_factor},${y_move_factor})`);
 
-    d3.json(
-        "../data/fire.json",
-        function (data) {
-            for (let key in data) {
-                let color = getColor();
-                if (color === "#FFFFFF") break; // TODO: remove this line
-                g1.selectAll(".pin").data(data[key]).enter().append("circle")
-                    .attr("class", "datapoint")
-                    .attr("r", 4)
-                    .attr("fill", "red")
-                    .attr("fill-opacity", "0.01")
-                    .attr("transform", function (d) {
-                        return "translate(" + gfg([d["lon"], d["lat"]]) + ")";
-                    });
-            }
-        });
+    // d3.json(
+    //     "../data/fire.json",
+    //     function (data) {
+    //         for (let key in data) {
+    //             let color = getColor();
+    //             if (color === "#FFFFFF") break; // TODO: remove this line
+    //             g1.selectAll(".pin").data(data[key]).enter().append("circle")
+    //                 .attr("class", "datapoint")
+    //                 .attr("r", 4)
+    //                 .attr("fill", "red")
+    //                 .attr("fill-opacity", "0.01")
+    //                 .attr("transform", function (d) {
+    //                     return "translate(" + gfg([d["lon"], d["lat"]]) + ")";
+    //                 });
+    //         }
+    //     });
 
     console.log(gfg.invert([1000, 800]));
     console.log(gfg.invert([-1000, -800]));
@@ -202,8 +221,8 @@
     })
 
     let zoom = d3.zoom()
-        .scaleExtent([1, 15])
-        .translateExtent([[-width / 2, -height / 2], [width * 3 / 2, height * 3 / 2]])
+        // .scaleExtent([1, 15])
+        // .translateExtent([[-width / 2, -height / 2], [width * 3 / 2, height * 3 / 2]])
         .on("zoom", function () {
             g.attr("transform", `translate(${d3.event.transform.x + x_move_factor},${d3.event.transform.y + y_move_factor}) scale(${d3.event.transform.k})`);
             g1.attr("transform", `translate(${d3.event.transform.x + x_move_factor},${d3.event.transform.y + y_move_factor}) scale(${d3.event.transform.k})`);
