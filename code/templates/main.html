@@ -61,11 +61,6 @@
     d3.json(
         "/data/geojson.json",
         function (data) {
-            g.append("image")
-                .attr('id', 'map')
-                .attr("xlink:href", "map.jpg")
-                .attr("transform", `translate(${-pic_width / 2},${-pic_height / 2}) scale(1)`);
-
             g.selectAll("path").data(data.features).enter().append("path") /* data.features to fill */
                 // `${population_interpolate(data.features.properties["population_density"][month_sel])}`
                 .attr("fill", function (d) {
@@ -143,7 +138,7 @@
                 .range([480, 0]);
             scale_pc.push(s);
 
-            if (txts[a] == "month") {
+            if (txts[a] === "month") {
                 s = d3.scaleBand()
                     .domain(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", " "])
                     .range([0, 480])
@@ -203,11 +198,11 @@
                 // recolor
                 for (let a = 0; a < dimensions.length; a++) {
                     svg2.selectAll(".pc" + a).attr("stroke", function (d) {
-                        if (selected.length == 0) {
+                        if (selected.length === 0) {
                             return color_normal
                         } else {
                             for (let i = 0; i < selected.length; i++) {
-                                if (d.id == selected[i]) {
+                                if (d.id === selected[i]) {
                                     return color_highlight
                                 }
                             }
