@@ -11,12 +11,14 @@ file_fire = pd.read_excel("data/fire.xlsx")
 grids = {}
 fire_types = []
 
+
 def time_to_month(time):
-    return (time.year - 2007)*12 + time.month - 1
+    return (time.year - 2007) * 12 + time.month - 1
+
 
 # UGLY
-def get_grid_id(lat,lng,grids):
-    near_key = None 
+def get_grid_id(lat, lng, grids):
+    near_key = None
     lats = list(grids.keys())
     lats.sort()
     for i in lats:
@@ -25,7 +27,7 @@ def get_grid_id(lat,lng,grids):
             break
     if not near_key or near_key - lat > 0.03:
         raise ValueError
-    
+
     near_key2 = None
     lngs = list(grids[near_key].keys())
     lngs.sort()
@@ -35,9 +37,10 @@ def get_grid_id(lat,lng,grids):
             break
     if not near_key2 or near_key2 - lng > 0.03:
         raise ValueError
-    
+
     gid = grids[near_key][near_key2]
     return gid
+
 
 class Fire:
     def __init__(self, event):
@@ -59,29 +62,30 @@ class Fire:
             self.type = len(fire_types)
             fire_types.append(event[2])
 
-
         self.main_station = "Not_found"
         self.support_station = ""
         if event[4] == "主战":
             self.main_station = event[3]
         else:
             self.support_station += event[3]
-        
+
         # self.temperature = None
         # self.wet = None
-    
+
     def append(self, event):
         if event[4] == "主战":
             self.main_station = event[3]
         else:
             self.support_station += event[3]
-    
+
     def js(self, usedweather):
         # id, type, main_station, support_station, lat, lng, year, month, day_of_week, hour, waiting to add......
-        d = {"id":self.id, "type":self.type, "day":self.time.dayofyear, "population":self.population, "year":self.time.year, "hour":round(self.time.hour + self.time.minute/60, 3), "main_station":self.main_station}
+        d = {"id": self.id, "type": self.type, "day": self.time.dayofyear, "population": self.population, "year": self.time.year, "hour": round(self.time.hour + self.time.minute / 60, 3),
+             "main_station": self.main_station}
         for key, value in usedweather.items():
             d[key] = file_weather[time_to_month(self.time)][self.grid][value]
         return d
+
 
 for i in range(len(file_population_density[0])):
     if file_population_density[0][i][0] in grids.keys():
@@ -100,7 +104,7 @@ for event in file_fire.values:
 file = {"type": "FeatureCollection", "features": []}
 distribute = {}
 
-useful_weather = {"temp":3, "rain":7}
+useful_weather = {"temp": 3, "rain": 7}
 
 for key, val in useful_weather.items():
     all_data = []
@@ -110,7 +114,7 @@ for key, val in useful_weather.items():
     all_data.sort()
     rg = all_data[-1] - all_data[0]
 
-    distribute[key] = {"range":[round(all_data[0] + rg/20*i, 3) for i in range(1,21)], "distribute":[0 for _ in range(20)], "firenum":[0 for _ in range(20)]}
+    distribute[key] = {"range": [round(all_data[0] + rg / 20 * i, 3) for i in range(1, 21)], "distribute": [0 for _ in range(20)], "firenum": [0 for _ in range(20)]}
 
     for each in all_data:
         for i in range(len(distribute[key]["range"])):
