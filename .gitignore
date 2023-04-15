@@ -1,9 +1,4 @@
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
 .history/
 *.vsix
 *.d
@@ -25,6 +20,7 @@
 *.exe
 *.out
 *.app
+.idea/*
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
