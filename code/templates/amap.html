@@ -78,20 +78,35 @@
         switch (data.type) {
             case "Station": {
                 feature = new AMap.Marker({
-                    position: new AMap.LngLat(data.lnglat.lng, data.lnglat.lat),
-                    zIndex: 3, extData: data, offset: new AMap.Pixel(data.offset.x, data.offset.y), title: data.name,
-                    content: fire_station_icon(data.level)
+                    position: new AMap.LngLat(data.lnglat.lng, data.lnglat.lat), zIndex: 3, title: data.name,
+                    content: fire_station_icon(data.level), offset: new AMap.Pixel(data.offset.x, data.offset.y),
+                    extData: data
+
                 });
                 AMap.event.addListener(feature, "click", mapFeatureClick);
-            }
                 break;
+            }
             case "Fire": {
                 feature = new AMap.Marker({
-                    position: new AMap.LngLat(data.lnglat.lng, data.lnglat.lat),
-                    zIndex: 3, extData: data, offset: new AMap.Pixel(data.offset.x, data.offset.y), title: data.name,
-                    content: fire_icon(data.level)
+                    position: new AMap.LngLat(data.lnglat.lng, data.lnglat.lat), zIndex: 3, title: data.name,
+                    content: fire_icon(data.level), offset: new AMap.Pixel(data.offset.x, data.offset.y),
+                    extData: data
                 });
                 AMap.event.addListener(feature, "click", mapFeatureClick);
+                break;
+            }
+            case "Population": {
+                let path = [
+                    new AMap.LngLat(data.lnglat.lng, data.lnglat.lat),
+                    new AMap.LngLat(data.lnglat.lng, data.lnglat.lat + 0.027),
+                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat),
+                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat + 0.027)
+                ]
+                feature = new AMap.Polygon({
+                    map: map, path: path, extData: data, zIndex: 1,
+                    fillColor: 'rgb(227, 209, 110)', fillOpacity: data.opacity
+                });
+                break;
             }
         }
         return feature;
@@ -134,8 +149,9 @@
         }
     }
 
-    var infoWindow, map, level = 12,
-        center = {lng: 119.50501, lat: 29.897525}, // amap location
+    let infoWindow, map, level = 12,
+        // center = {lng: 119.50501, lat: 29.897525}, // amap location
+        center = {lng: 119.5, lat: 29.9}, // amap location
         features = [];
 
     // var gps = [119.5, 29.9];
@@ -157,8 +173,7 @@
 
     map = new AMap.Map("mapContainer",
         {
-            // mapStyle: "amap://styles/bc6185e8e0dfb70ed2d1e2ed883c2482",
-            mapStyle: "amap://styles/dark",
+            mapStyle: "amap://styles/7ee3a74e7122d6cff8845b7085c0b971",
             center: new AMap.LngLat(center.lng, center.lat),
             level: level,
             keyboardEnable: true,
@@ -180,22 +195,42 @@
     });
 
 </script>
+<script>
+    /* Helper function */
+    function isEarlierEqual(a, b) {
+        if (a.year < b.year) return true;
+        if (a.year > b.year) return false;
+        // Same year
+        return a.month <= b.month;
+    }
+
+</script>
 
 <script>
-    let marker_fire_stations;
+    let marker_fire_stations = [];
     d3.json("/data/fire_station.json", function (data) {
-        let markers = [];
         for (const dataKey in data) {
             let record = data[dataKey];
-            markers.push(genMarker({
+            marker_fire_stations.push(genMarker({
                 "type": "Station", "lnglat": {"lng": record[2], "lat": record[1]},
-                "name": "fire_station " + dataKey,
-                "offset": {"x": -fire_station_icon.side_length / 2, "y": -fire_station_icon.side_length / 2}, "level": 1
+                "name": "fire_station " + dataKey, "level": 1,
+                "offset": {"x": -fire_station_icon.side_length / 2, "y": -fire_station_icon.side_length / 2},
+                "year": record[5], "month": record[4], "district": record[0]
             }))
         }
-        marker_fire_stations = new AMap.OverlayGroup(markers);
-        map.add(marker_fire_stations);
+        display_fire_station(2007, 1);
     })
+
+    function display_fire_station(year, month) {
+        for (const markerFireStation of marker_fire_stations) {
+            let data = markerFireStation.getExtData();
+            if (isEarlierEqual(data, {"year": year, "month": month})) {
+                map.add(markerFireStation);
+            } else {
+                map.remove(markerFireStation);
+            }
+        }
+    }
 
     let marker_fire = {
         "year": {},
@@ -210,43 +245,72 @@
             let marker = genMarker({
                 "type": "Fire", "lnglat": {"lng": record["lnglat"][0], "lat": record["lnglat"][1]},
                 "name": "fire " + dataKey,
-                "offset": {"x": -fire_icon.side_length / 2, "y": -fire_icon.side_length / 2}, "level": 1
+                "offset": {"x": -fire_icon.side_length / 2, "y": -fire_icon.side_length / 2}, "level": 1,
+                "time": new Date(record["time"])
             })
 
             for (const fighter of record["fighters"]) {
                 if (marker_fire["fighter"][fighter] === undefined) {
-                    marker_fire["fighter"][fighter] = new AMap.OverlayGroup([marker]);
+                    marker_fire["fighter"][fighter] = [marker];
                 } else {
-                    marker_fire["fighter"][fighter].addOverlay(marker);
+                    marker_fire["fighter"][fighter].push(marker);
                 }
             }
             if (marker_fire["key_fighter"][record["key_fighter"]] === undefined) {
-                marker_fire["key_fighter"][record["key_fighter"]] = new AMap.OverlayGroup([marker]);
+                marker_fire["key_fighter"][record["key_fighter"]] = [marker];
             } else {
-                marker_fire["key_fighter"][record["key_fighter"]].addOverlay(marker);
+                marker_fire["key_fighter"][record["key_fighter"]].push(marker);
             }
             if (marker_fire["type"][record["type"]] === undefined) {
-                marker_fire["type"][record["type"]] = new AMap.OverlayGroup([marker]);
+                marker_fire["type"][record["type"]] = [marker];
             } else {
-                marker_fire["type"][record["type"]].addOverlay(marker);
+                marker_fire["type"][record["type"]].push(marker);
             }
             let year = String(new Date(record["time"]).getFullYear());
             let month = String(new Date(record["time"]).getMonth());
             if (marker_fire["year"][year] === undefined) {
-                marker_fire["year"][year] = new AMap.OverlayGroup([marker]);
+                marker_fire["year"][year] = [marker];
             } else {
-                marker_fire["year"][year].addOverlay(marker);
+                marker_fire["year"][year].push(marker);
             }
             if (marker_fire["month"][month] === undefined) {
-                marker_fire["month"][month] = new AMap.OverlayGroup([marker]);
+                marker_fire["month"][month] = [marker];
             } else {
-                marker_fire["month"][month].addOverlay(marker);
+                marker_fire["month"][month].push(marker);
             }
         }
-        // marker_fire = new AMap.OverlayGroup(markers);
-        // map.add(marker_fire);
+        display_fire({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
     })
 
+    /* from/to: {"year": 2004, "month": 4}*/
+    function display_fire(from, to) {
+        for (let i = from.year; i <= to.year; i++) {
+            let group = marker_fire.year[i];
+            if (group === undefined) continue;
+            for (const groupElement of group) {
+                let timestamp = groupElement.getExtData().time;
+                if (isEarlierEqual(from, {"year": timestamp.getFullYear(), "month": timestamp.getMonth()}) &&
+                    isEarlierEqual({"year": timestamp.getFullYear(), "month": timestamp.getMonth()}, to)) {
+                    map.add(groupElement);
+                } else {
+                    map.remove(groupElement);
+                }
+            }
+        }
+    }
+
+    let population_industry = []
+    d3.text("/data/population_industry.csv", function (text) {
+        population_industry = d3.csvParseRows(text, d => d.map(Number));
+        for (const locationElement of population_industry) {
+
+        }
+    });
+
+    function display_population(from, to) {
+        let begin_column = (from.year - 2007) * 12 + from.month - 1;
+        let end_column = (to.year - 2007) * 12 + to.month - 1;
+    }
 </script>
 
 </body>
