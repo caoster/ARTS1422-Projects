@@ -101,7 +101,6 @@
                     new AMap.LngLat(data.lnglat.lng, data.lnglat.lat + 0.027),
                     new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat + 0.027),
                     new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat)
-
                 ]
                 feature = new AMap.Polygon({
                     map: map, path: path, extData: data, zIndex: 1,
@@ -116,7 +115,6 @@
                     new AMap.LngLat(data.lnglat.lng, data.lnglat.lat + 0.027),
                     new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat + 0.027),
                     new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat)
-
                 ]
                 feature = new AMap.Polygon({
                     map: map, path: path, extData: data, zIndex: 1,
@@ -129,61 +127,14 @@
         return feature;
     }
 
-    function addFeature(data) {
-        let feature, j, jl, path;
-        switch (data.type) {
-            case "Marker":
-                feature = new AMap.Marker({
-                    map: map, position: new AMap.LngLat(data.lnglat.lng, data.lnglat.lat),
-                    zIndex: 3, extData: data, offset: new AMap.Pixel(data.offset.x, data.offset.y), title: data.name,
-                    content: fire_station_icon(data.level)
-                });
-                break;
-            case "Polyline":
-                for (j = 0, jl = data.path.length, path = []; j < jl; j++) {
-                    path.push(new AMap.LngLat(data.path[j].lng, data.path[j].lat));
-                }
-                feature = new AMap.Polyline({
-                    map: map, path: path, extData: data, zIndex: 2,
-                    strokeWeight: data.strokeWeight, strokeColor: data.strokeColor, strokeOpacity: data.strokeOpacity
-                });
-                break;
-            case "Polygon":
-                for (j = 0, jl = data.path.length, path = []; j < jl; j++) {
-                    path.push(new AMap.LngLat(data.path[j].lng, data.path[j].lat));
-                }
-                feature = new AMap.Polygon({
-                    map: map, path: path, extData: data, zIndex: 1,
-                    strokeWeight: data.strokeWeight, strokeColor: data.strokeColor, strokeOpacity: data.strokeOpacity,
-                    fillColor: data.fillColor, fillOpacity: data.fillOpacity
-                });
-                break;
-            default:
-                feature = null;
-        }
-        if (feature) {
-            AMap.event.addListener(feature, "click", mapFeatureClick);
-        }
-    }
-
-    let infoWindow, map, level = 12,
-        // center = {lng: 119.50501, lat: 29.897525}, // amap location
-        center = {lng: 119.5, lat: 29.9}, // amap location
-        features = [];
-
-    // var gps = [119.5, 29.9];
-    // AMap.convertFrom(gps, 'gps', function (status, result) {
-    //     if (result.info === 'ok') {
-    //         var lnglats = result.locations; // Array.<LngLat>
-    //         console.log(lnglats);
-    //     }
-    // });
+    let infoWindow, map, level = 11,
+        center = {lng: 120.212, lat: 30.247}; // amap location
 
     function mapFeatureClick(e) {
         if (!infoWindow) {
             infoWindow = new AMap.InfoWindow({autoMove: true, isCustom: false});
         }
-        var extData = e.target.getExtData();
+        let extData = e.target.getExtData();
         infoWindow.setContent("<div class='myinfowindow'><h5>" + extData.name + "</h5><div>" + extData.desc + "</div></div>");
         infoWindow.open(map, e.lnglat);
     }
@@ -199,9 +150,6 @@
             doubleClickZoom: true
         });
     new AMap.TileLayer.RoadNet({map: map, zIndex: 2});
-    for (let i = 0, len = features.length; i < len; i++) {
-        addFeature(features[i]);
-    }
 
     map.on('complete', function () {
         map.plugin(["AMap.OverView", "AMap.Scale"], function () {
@@ -320,7 +268,7 @@
     d3.text("/data/population_industry.csv", function (text) {
         population_industry = d3.csvParseRows(text, d => d.map(Number));
         display_population({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
-        // display_enterprise({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
+        display_enterprise({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
     });
 
 

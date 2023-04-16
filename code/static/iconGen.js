@@ -55,8 +55,5 @@ function opacity_enterprise(capital, count) {
     else if (count < 6376) b = 0.5;
     else b = 0.7;
 
-    console.log(capital)
-    console.log(count)
-    console.log( 2 * a * b / (a + b))
     return 2 * a * b / (a + b);
 }
