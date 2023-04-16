@@ -99,12 +99,14 @@
                 let path = [
                     new AMap.LngLat(data.lnglat.lng, data.lnglat.lat),
                     new AMap.LngLat(data.lnglat.lng, data.lnglat.lat + 0.027),
-                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat),
-                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat + 0.027)
+                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat + 0.027),
+                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat)
+
                 ]
                 feature = new AMap.Polygon({
                     map: map, path: path, extData: data, zIndex: 1,
-                    fillColor: 'rgb(227, 209, 110)', fillOpacity: data.opacity
+                    fillColor: `rgba(227, 209, 110, ${opacity_population(data.population)})`,
+                    strokeOpacity: 0
                 });
                 break;
             }
@@ -218,7 +220,7 @@
                 "year": record[5], "month": record[4], "district": record[0]
             }))
         }
-        display_fire_station(2007, 1);
+        display_fire_station(2020, 7);
     })
 
     function display_fire_station(year, month) {
@@ -302,14 +304,31 @@
     let population_industry = []
     d3.text("/data/population_industry.csv", function (text) {
         population_industry = d3.csvParseRows(text, d => d.map(Number));
-        for (const locationElement of population_industry) {
-
-        }
+        display_population({"year": 2020, "month": 7}, {"year": 9999, "month": 1})
     });
 
+
+    // density: 17122.0 0.0
+    // capital: 60000.0 0.0
+    let marker_population = new AMap.OverlayGroup([]);
     function display_population(from, to) {
-        let begin_column = (from.year - 2007) * 12 + from.month - 1;
-        let end_column = (to.year - 2007) * 12 + to.month - 1;
+        marker_population.clearOverlays();
+        let begin_column = Math.max((from.year - 2007) * 12 + from.month - 1, 0);
+        let end_column = Math.min((to.year - 2007) * 12 + to.month - 1, (population_industry[0].length - 2) / 3);
+
+        for (const locationElement of population_industry) {
+            let i = begin_column, avg = 0;
+            while (i <= end_column && (3 * i + 2) < locationElement.length) {
+                avg += locationElement[3 * i + 2];
+                i++;
+            }
+            avg /= (end_column - begin_column);
+            marker_population.addOverlay(genMarker({
+                "type": "Population",
+                "lnglat": {"lng": locationElement[1], "lat": locationElement[0]}, population: avg
+            }));
+        }
+        map.add(marker_population)
     }
 </script>
 

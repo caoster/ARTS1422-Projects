@@ -27,3 +27,13 @@ function fire_icon(level) {
 }
 
 fire_icon.side_length = 25;
+
+function opacity_population(data) {
+    // max: 17573.560
+    // min: 0.103
+    if (data < 1169) return 0.1;
+    if (data < 1447) return 0.2;
+    if (data < 1976) return 0.3;
+    if (data < 3418) return 0.5;
+    return 0.7;
+}
