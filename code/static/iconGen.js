@@ -37,3 +37,26 @@ function opacity_population(data) {
     if (data < 3418) return 0.5;
     return 0.7;
 }
+
+function opacity_enterprise(capital, count) {
+    // density: 17122.0 0.0
+    // capital: 60000.0 0.0
+    let a;
+    if (capital < 1189) a = 0.1;
+    else if (capital < 1427) a = 0.2;
+    else if (capital < 1938) a = 0.3;
+    else if (capital < 3382) a = 0.5;
+    else a = 0.7;
+
+    let b;
+    if (count < 1549) b = 0.1;
+    else if (count < 2322) b = 0.2;
+    else if (count < 3558) b = 0.3;
+    else if (count < 6376) b = 0.5;
+    else b = 0.7;
+
+    console.log(capital)
+    console.log(count)
+    console.log( 2 * a * b / (a + b))
+    return 2 * a * b / (a + b);
+}

@@ -9,6 +9,8 @@ import datetime as dt
 population_density = np.load("data/population_density.npy")
 regional_industry = np.load("data/regional_industry.npy")
 
+a = regional_industry[167] - regional_industry[0]
+
 pop_min = math.inf
 pop_max = -math.inf
 
@@ -28,12 +30,14 @@ for i in population_density:
 print(pop_max, pop_min)
 a = np.array(a)
 print(f"a.size: {a.size}")
-# a = a[a > 1000]
-# print(a.size)
 plt.hist(a, bins=1000)
 plt.show()
 # 17573.560546875 0.1028831228613853
 
+
+# exit(0)
+pop_min = math.inf
+pop_max = -math.inf
 b = []
 for i in regional_industry:
     for j in i:
@@ -49,6 +53,9 @@ print(f"b.size: {b.size}")
 # print(b.size)
 plt.hist(b, bins=1000)
 plt.show()
+
+# numpy brief about a
+print(f"percentile: {numpy.percentile(b, [20, 40, 60, 80])}")
 
 print(list(cal.values()).count(False))
 print(list(cal.values()).count(True))
@@ -99,7 +106,7 @@ for i in p:
     for j in p[i]:
         q[-1] += j
 res = np.array(q)
-np.savetxt("population_industry.csv", res, fmt='%.3f,%.3f' + ',%.3f,%.3f,%i' * 168)
+# np.savetxt("population_industry.csv", res, fmt='%.3f,%.3f' + ',%.3f,%.3f,%i' * 168)
 
 
 population_density_header = [
