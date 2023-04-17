@@ -75,60 +75,6 @@
 <script src="//webapi.amap.com/loca?v=1.3.2&key=c47c57fecbe4f750cdb90854f1c9a814"></script>
 <script src="//a.amap.com/Loca/static/dist/jquery.min.js"></script>
 <script>
-    function genMarker(data) {
-        let feature;
-        switch (data.type) {
-            case "Station": {
-                feature = new AMap.Marker({
-                    position: new AMap.LngLat(data.lnglat.lng, data.lnglat.lat), zIndex: 3, title: data.name,
-                    content: fire_station_icon(data.level), offset: new AMap.Pixel(data.offset.x, data.offset.y),
-                    extData: data
-
-                });
-                AMap.event.addListener(feature, "click", mapFeatureClick);
-                break;
-            }
-            case "Fire": {
-                feature = new AMap.Marker({
-                    position: new AMap.LngLat(data.lnglat.lng, data.lnglat.lat), zIndex: 3, title: data.name,
-                    content: fire_icon(data.level), offset: new AMap.Pixel(data.offset.x, data.offset.y),
-                    extData: data
-                });
-                AMap.event.addListener(feature, "click", mapFeatureClick);
-                break;
-            }
-            case "Population": {
-                let path = [
-                    new AMap.LngLat(data.lnglat.lng, data.lnglat.lat),
-                    new AMap.LngLat(data.lnglat.lng, data.lnglat.lat + 0.027),
-                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat + 0.027),
-                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat)
-                ]
-                feature = new AMap.Polygon({
-                    map: map, path: path, extData: data, zIndex: 1,
-                    fillColor: `rgba(227, 209, 110, ${opacity_population(data.population)})`,
-                    strokeOpacity: 0
-                });
-                break;
-            }
-            case "Enterprise": {
-                let path = [
-                    new AMap.LngLat(data.lnglat.lng, data.lnglat.lat),
-                    new AMap.LngLat(data.lnglat.lng, data.lnglat.lat + 0.027),
-                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat + 0.027),
-                    new AMap.LngLat(data.lnglat.lng + 0.027, data.lnglat.lat)
-                ]
-                feature = new AMap.Polygon({
-                    map: map, path: path, extData: data, zIndex: 1,
-                    fillColor: `rgba(136, 91, 193, ${opacity_enterprise(data.capital, data.count)})`,
-                    strokeOpacity: 0
-                });
-                break;
-            }
-        }
-        return feature;
-    }
-
     let infoWindow, map, level = 13,
         center = {lng: 120.14325, lat: 30.281472}; // amap location
 
@@ -162,15 +108,8 @@
     });
 
 </script>
+<!-- Helper functions -->
 <script>
-    /* Helper function */
-    function isEarlierEqual(a, b) {
-        if (a.year < b.year) return true;
-        if (a.year > b.year) return false;
-        // Same year
-        return a.month <= b.month;
-    }
-
     function loadScript(src, callback) {
         let script = document.createElement('script');
         script.setAttribute('src', src);
@@ -273,7 +212,7 @@
 <!-- Population & Industry -->
 <script>
     loadScript("/data/population_industry.js", function () {
-        console.log("Fire station data loaded!");
+        console.log("Population industry data loaded!");
         display_population();
         display_industry();
     })
@@ -315,7 +254,6 @@
             });
         }
 
-        console.log(display_population_industry_list)
         populationLayer.setData(display_population_industry_list, {lnglat: 'coordinates'});
         populationLayer.setOptions({
             unit: 'px',
