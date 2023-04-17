@@ -9,7 +9,7 @@ function drawLeftPanel() {
             "minute": 5,
             "population": true,
             "enterprise": true,
-            "select": true
+            "select": false
         }
         drawLeftPanel.canvas.addEventListener("click", (event) => {
             if (ctx.isPointInPath(drawLeftPanel.fire_button, event.offsetX, event.offsetY)) drawLeftPanel.settings.fire = !drawLeftPanel.settings.fire;
@@ -117,7 +117,7 @@ function drawLeftPanel() {
     if (drawLeftPanel.settings.enterprise)
         drawLeftPanel.enterprise_button = rounded_rect(ctx, 17, 331, 209, 54, 20, 'rgba(184, 155, 221, 1)', 'rgba(184, 155, 221, 0.4)');
     else
-        drawLeftPanel.population_button = rounded_rect(ctx, 17, 331, 209, 54, 20, 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)');
+        drawLeftPanel.enterprise_button = rounded_rect(ctx, 17, 331, 209, 54, 20, 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)');
     drawImage("static/texture/enterprise.png", 50, 337, 0.5);
     ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     ctx.fillText("企业密度", 140, 365);
