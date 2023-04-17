@@ -28,6 +28,36 @@ function fire_icon(level) {
 
 fire_icon.side_length = 25;
 
+function radius_fire(level) {
+    switch (level) {
+        case 1:
+            return 3;
+        case 2:
+            return 4;
+        case 3:
+            return 6;
+        case 4:
+            return 7;
+        default:
+            return 2;
+    }
+}
+
+function radius_fire_station(level) {
+    switch (level) {
+        case 1:
+            return 6;
+        case 2:
+            return 8;
+        case 3:
+            return 10;
+        case 4:
+            return 12;
+        default:
+            return 6;
+    }
+}
+
 function opacity_population(data) {
     // max: 17573.560
     // min: 0.103

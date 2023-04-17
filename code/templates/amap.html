@@ -72,6 +72,8 @@
 <script src="static/iconGen.js"></script>
 <script src="https://d3js.org/d3.v4.js"></script>
 <script src="//webapi.amap.com/maps?v=1.4.15&key=c47c57fecbe4f750cdb90854f1c9a814"></script>
+<script src="//webapi.amap.com/loca?v=1.3.2&key=c47c57fecbe4f750cdb90854f1c9a814"></script>
+<script src="//a.amap.com/Loca/static/dist/jquery.min.js"></script>
 <script>
     function genMarker(data) {
         let feature;
@@ -127,8 +129,8 @@
         return feature;
     }
 
-    let infoWindow, map, level = 11,
-        center = {lng: 120.212, lat: 30.247}; // amap location
+    let infoWindow, map, level = 13,
+        center = {lng: 120.14325, lat: 30.281472}; // amap location
 
     function mapFeatureClick(e) {
         if (!infoWindow) {
@@ -147,7 +149,8 @@
             keyboardEnable: true,
             dragEnable: true,
             scrollWheel: true,
-            doubleClickZoom: true
+            doubleClickZoom: true,
+            // viewMode: '3D',
         });
     new AMap.TileLayer.RoadNet({map: map, zIndex: 2});
 
@@ -169,106 +172,37 @@
         return a.month <= b.month;
     }
 
+    function loadScript(src, callback) {
+        let script = document.createElement('script');
+        script.setAttribute('src', src);
+        script.addEventListener('load', callback, {once: true})
+        document.head.appendChild(script);
+    }
+
+    let begin = new Date();
+    begin.setFullYear(2020);
+    begin.setMonth(7);
+    let end = new Date();
+    end.setFullYear(2021);
+    end.setMonth(1);
+
+    function inTimePeriod(obj) {
+        return begin <= obj.time && obj.time <= end;
+    }
+
+    function beforeEndTime(obj) {
+        return obj.time <= end;
+    }
+
+
 </script>
 
 <script>
-    let marker_fire_stations = [];
-    d3.json("/data/fire_station.json", function (data) {
-        for (const dataKey in data) {
-            let record = data[dataKey];
-            marker_fire_stations.push(genMarker({
-                "type": "Station", "lnglat": {"lng": record[2], "lat": record[1]},
-                "name": "fire_station " + dataKey, "level": 1,
-                "offset": {"x": -fire_station_icon.side_length / 2, "y": -fire_station_icon.side_length / 2},
-                "year": record[5], "month": record[4], "district": record[0]
-            }))
-        }
-        display_fire_station(2020, 7);
-    })
-
-    function display_fire_station(year, month) {
-        for (const markerFireStation of marker_fire_stations) {
-            let data = markerFireStation.getExtData();
-            if (isEarlierEqual(data, {"year": year, "month": month})) {
-                map.add(markerFireStation);
-            } else {
-                map.remove(markerFireStation);
-            }
-        }
-    }
-
-    let marker_fire = {
-        "year": {},
-        "month": {},
-        "type": {},
-        "key_fighter": {},
-        "fighter": {}
-    };
-    d3.json("/data/fire.json", function (data) {
-        for (const dataKey in data) {
-            let record = data[dataKey];
-            let marker = genMarker({
-                "type": "Fire", "lnglat": {"lng": record["lnglat"][0], "lat": record["lnglat"][1]},
-                "name": "fire " + dataKey,
-                "offset": {"x": -fire_icon.side_length / 2, "y": -fire_icon.side_length / 2}, "level": 1,
-                "time": new Date(record["time"])
-            })
-
-            for (const fighter of record["fighters"]) {
-                if (marker_fire["fighter"][fighter] === undefined) {
-                    marker_fire["fighter"][fighter] = [marker];
-                } else {
-                    marker_fire["fighter"][fighter].push(marker);
-                }
-            }
-            if (marker_fire["key_fighter"][record["key_fighter"]] === undefined) {
-                marker_fire["key_fighter"][record["key_fighter"]] = [marker];
-            } else {
-                marker_fire["key_fighter"][record["key_fighter"]].push(marker);
-            }
-            if (marker_fire["type"][record["type"]] === undefined) {
-                marker_fire["type"][record["type"]] = [marker];
-            } else {
-                marker_fire["type"][record["type"]].push(marker);
-            }
-            let year = String(new Date(record["time"]).getFullYear());
-            let month = String(new Date(record["time"]).getMonth());
-            if (marker_fire["year"][year] === undefined) {
-                marker_fire["year"][year] = [marker];
-            } else {
-                marker_fire["year"][year].push(marker);
-            }
-            if (marker_fire["month"][month] === undefined) {
-                marker_fire["month"][month] = [marker];
-            } else {
-                marker_fire["month"][month].push(marker);
-            }
-        }
-        display_fire({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
-    })
-
-    /* from/to: {"year": 2004, "month": 4}*/
-    function display_fire(from, to) {
-        for (let i = from.year; i <= to.year; i++) {
-            let group = marker_fire.year[i];
-            if (group === undefined) continue;
-            for (const groupElement of group) {
-                let timestamp = groupElement.getExtData().time;
-                if (isEarlierEqual(from, {"year": timestamp.getFullYear(), "month": timestamp.getMonth()}) &&
-                    isEarlierEqual({"year": timestamp.getFullYear(), "month": timestamp.getMonth()}, to)) {
-                    map.add(groupElement);
-                } else {
-                    map.remove(groupElement);
-                }
-            }
-        }
-    }
-
     let population_industry = []
     d3.text("/data/population_industry.csv", function (text) {
         population_industry = d3.csvParseRows(text, d => d.map(Number));
-        display_population({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
-        display_enterprise({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
+        // display_population({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
+        // display_enterprise({"year": 2020, "month": 7}, {"year": 9999, "month": 1});
     });
 
 
@@ -318,6 +252,78 @@
             }));
         }
         map.add(marker_enterprise)
+    }
+</script>
+<script>
+    loadScript("/data/fire.js", function () {
+        for (let fireElement of fire) {
+            fireElement.time = new Date(fireElement.time)
+        }
+        console.log("Fire data loaded!");
+        display_fire(inTimePeriod);
+    })
+
+    let fireLayer = new Loca.ScatterPointLayer({
+        map: map,
+        eventSupport: true,
+        zIndex: 300
+    });
+
+    /* filter is a function that returns bool */
+    function display_fire(filter) {
+        let display_fire_list = [];
+        for (const fireElement of fire) {
+            if (filter(fireElement)) {
+                display_fire_list.push(fireElement);
+            }
+        }
+        fireLayer.setData(display_fire_list, {lnglat: 'lnglat'});
+        fireLayer.setOptions({
+            unit: 'px',
+            style: {
+                radius: function (obj) {
+                    return radius_fire(obj.value.level);
+                },
+                color: 'rgb(251, 61, 95)',
+            }
+        });
+        fireLayer.render();
+    }
+</script>
+<script>
+    loadScript("/data/fire_station.js", function () {
+        for (let fireStationElement of fire_station) {
+            fireStationElement.time = new Date(fireStationElement.time)
+        }
+        console.log("Fire station data loaded!");
+        display_fire_station(beforeEndTime);
+    })
+
+    let fireStationLayer = new Loca.ScatterPointLayer({
+        map: map,
+        eventSupport: true,
+        zIndex: 301
+    });
+
+    /* filter is a function that returns bool */
+    function display_fire_station(filter) {
+        let display_fire_station_list = [];
+        for (const fireStationElement of fire_station) {
+            if (filter(fireStationElement)) {
+                display_fire_station_list.push(fireStationElement);
+            }
+        }
+        fireStationLayer.setData(display_fire_station_list, {lnglat: 'lnglat'});
+        fireStationLayer.setOptions({
+            unit: 'px',
+            style: {
+                radius: function (obj) {
+                    return radius_fire_station(obj.value.level);
+                },
+                color: 'rgb(27, 169, 101)',
+            }
+        });
+        fireStationLayer.render();
     }
 </script>
 
