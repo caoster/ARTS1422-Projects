@@ -31,30 +31,30 @@ fire_icon.side_length = 25;
 function radius_fire(level) {
     switch (level) {
         case 1:
-            return 3;
-        case 2:
-            return 4;
-        case 3:
             return 6;
+        case 2:
+            return 8;
+        case 3:
+            return 12;
         case 4:
-            return 7;
+            return 14;
         default:
-            return 2;
+            return 4;
     }
 }
 
 function radius_fire_station(level) {
     switch (level) {
         case 1:
-            return 6;
-        case 2:
-            return 8;
-        case 3:
-            return 10;
-        case 4:
             return 12;
+        case 2:
+            return 16;
+        case 3:
+            return 20;
+        case 4:
+            return 24;
         default:
-            return 6;
+            return 12;
     }
 }
 
