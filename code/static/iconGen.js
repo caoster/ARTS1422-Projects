@@ -31,31 +31,21 @@ fire_icon.side_length = 25;
 function radius_fire(level) {
     switch (level) {
         case 1:
-            return 6;
+            return 4;
         case 2:
             return 8;
         case 3:
             return 12;
         case 4:
-            return 14;
+            return 16;
         default:
             return 4;
     }
 }
 
 function radius_fire_station(level) {
-    switch (level) {
-        case 1:
-            return 12;
-        case 2:
-            return 16;
-        case 3:
-            return 20;
-        case 4:
-            return 24;
-        default:
-            return 12;
-    }
+    if (level === 1) return 8;
+    return 16;
 }
 
 function opacity_population(data) {
@@ -71,12 +61,12 @@ function opacity_population(data) {
 function opacity_enterprise(capital, count) {
     // density: 17122.0 0.0
     // capital: 60000.0 0.0
-    let a;
-    if (capital < 1189) a = 0.1;
-    else if (capital < 1427) a = 0.2;
-    else if (capital < 1938) a = 0.3;
-    else if (capital < 3382) a = 0.5;
-    else a = 0.7;
+    // let a;
+    // if (capital < 1189) a = 0.1;
+    // else if (capital < 1427) a = 0.2;
+    // else if (capital < 1938) a = 0.3;
+    // else if (capital < 3382) a = 0.5;
+    // else a = 0.7;
 
     let b;
     if (count < 1549) b = 0.1;
@@ -85,5 +75,6 @@ function opacity_enterprise(capital, count) {
     else if (count < 6376) b = 0.5;
     else b = 0.7;
 
-    return 2 * a * b / (a + b);
+    // return 2 * a * b / (a + b);
+    return b
 }

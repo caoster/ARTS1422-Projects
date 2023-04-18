@@ -71,13 +71,17 @@
 <script src="static/panel.js"></script>
 <script src="static/iconGen.js"></script>
 <script src="https://d3js.org/d3.v4.js"></script>
-<script src="//webapi.amap.com/maps?v=1.4.15&key=c47c57fecbe4f750cdb90854f1c9a814"></script>
-<script src="//webapi.amap.com/loca?v=1.3.2&key=c47c57fecbe4f750cdb90854f1c9a814"></script>
+<script src="//webapi.amap.com/maps?v=1.4.15&key=736114382e4cd8877312b9345a0f3c9e"></script>
+<script src="//webapi.amap.com/loca?v=1.3.2&key=736114382e4cd8877312b9345a0f3c9e"></script>
 <script src="//a.amap.com/Loca/static/dist/jquery.min.js"></script>
 <script>
-    let infoWindow, map, level = 13,
-        center = {lng: 120.14325, lat: 30.281472}; // amap location
+    let infoWindow, map, level = 12,
+        // center = {lng: 120.14325, lat: 30.281472}; // amap location
+        center = {
+            lat: 30.1706,
 
+            lng: 119.866875
+        }
     function mapFeatureClick(e) {
         if (!infoWindow) {
             infoWindow = new AMap.InfoWindow({autoMove: true, isCustom: false});
@@ -89,7 +93,7 @@
 
     map = new AMap.Map("mapContainer",
         {
-            mapStyle: "amap://styles/7ee3a74e7122d6cff8845b7085c0b971",
+            mapStyle: "amap://styles/15be39cd092f01f713ec68eebbb76121",
             center: new AMap.LngLat(center.lng, center.lat),
             level: level,
             keyboardEnable: true,
@@ -97,7 +101,7 @@
             scrollWheel: true,
             doubleClickZoom: true
         });
-    new AMap.TileLayer.RoadNet({map: map, zIndex: 2});
+    //    new AMap.TileLayer.RoadNet({map: map, zIndex: 2});
 
     map.on('complete', function () {
         map.plugin(["AMap.OverView", "AMap.Scale"], function () {
@@ -209,15 +213,15 @@
         fireStationLayer.render();
     }
 </script>
-<!-- Population & Industry -->
+<!-- Population & Enterprise -->
 <script>
     loadScript("/data/population_industry.js", function () {
         console.log("Population industry data loaded!");
         display_population();
-        display_industry();
+        display_enterprise();
     })
 
-    let industryLayer = new Loca.PolygonLayer({
+    let enterpriseLayer = new Loca.PolygonLayer({
         map: map,
         eventSupport: true,
         zIndex: 298
@@ -267,45 +271,43 @@
         populationLayer.render();
     }
 
-    function display_industry() {
-        let display_population_industry_list = [];
+    function display_enterprise() {
+        let display_population_enterprise_list = [];
 
         let begin_column = Math.max((begin.getFullYear() - 2007) * 12 + begin.getMonth() - 1, 0);
         let end_column = Math.min((end.getFullYear() - 2007) * 12 + end.getMonth() - 1, (population_industry[0].length - 2) / 3 - 1);
 
         for (const locationElement of population_industry) {
-            let i = begin_column, avg_capital = 0, avg_count = 0;
+            let i = begin_column, max_capital = 0, max_count = 0;
             while (i <= end_column) {
-                avg_capital += locationElement[3 * i + 3];
-                avg_count += locationElement[3 * i + 4];
+                max_capital = Math.max(max_capital, locationElement[3 * i + 3]);
+                max_count = Math.max (max_count, locationElement[3 * i + 4]);
                 i++;
             }
-            avg_capital /= (end_column - begin_column);
-            avg_count /= (end_column - begin_column);
             let lng = locationElement[1], lat = locationElement[0];
-            display_population_industry_list.push({
+            display_population_enterprise_list.push({
                 "coordinates": [
                     [lng, lat],
                     [lng, lat + 0.027],
                     [lng + 0.027, lat + 0.027],
                     [lng + 0.027, lat]
                 ],
-                "avg_capital": avg_capital,
-                "avg_count": avg_count
+                "max_capital": max_capital,
+                "max_count": max_count
             });
         }
 
-        industryLayer.setData(display_population_industry_list, {lnglat: 'coordinates'});
-        industryLayer.setOptions({
+        enterpriseLayer.setData(display_population_enterprise_list, {lnglat: 'coordinates'});
+        enterpriseLayer.setOptions({
             unit: 'px',
             style: {
                 color: 'rgb(136, 91, 193)',
                 opacity: function (obj) {
-                    return opacity_population(obj.value.avg);
+                    return opacity_enterprise(obj.value.max_capital, obj.value.max_count);
                 }
             }
         });
-        industryLayer.render();
+        enterpriseLayer.render();
     }
 </script>
 

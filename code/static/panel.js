@@ -21,8 +21,13 @@ function drawLeftPanel() {
             else if (ctx.isPointInPath(drawLeftPanel.population_button, event.offsetX, event.offsetY)) drawLeftPanel.settings.population = !drawLeftPanel.settings.population;
             else if (ctx.isPointInPath(drawLeftPanel.enterprise_button, event.offsetX, event.offsetY)) drawLeftPanel.settings.enterprise = !drawLeftPanel.settings.enterprise;
             else if (ctx.isPointInPath(drawLeftPanel.select_button, event.offsetX, event.offsetY)) drawLeftPanel.settings.select = !drawLeftPanel.settings.select;
+            else return;
             ctx.clearRect(0, 0, drawLeftPanel.canvas.width, drawLeftPanel.canvas.height);
             drawLeftPanel();
+            drawLeftPanel.settings.fire ? fireLayer.show(): fireLayer.hide();
+            drawLeftPanel.settings.fire_station ? fireStationLayer.show(): fireStationLayer.hide();
+            drawLeftPanel.settings.population ? populationLayer.show(): populationLayer.hide();
+            drawLeftPanel.settings.enterprise ? enterpriseLayer.show(): enterpriseLayer.hide();
         });
     }
 
