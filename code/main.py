@@ -36,9 +36,9 @@ fire_station['time'] = fire_station['time'].map(lambda x: datetime.date(year=int
 fire_station['level'] = 1
 fire_station = str(list(fire_station.T.to_dict().values()))
 
-population_industry: str
-with open("static/population_industry.js", "r") as file:
-    population_industry = file.read()
+population_enterprise: str
+with open("static/population_enterprise.js", "r") as file:
+    population_enterprise = file.read()
 
 with open("token.secret") as token:
     TOKEN = token.read()
@@ -70,9 +70,9 @@ def proxy(path):
     return redirect_proxy("https://restapi.amap.com/", path)
 
 
-@app.route("/data/population_industry.js")
-def population_industry_js():
-    return population_industry
+@app.route("/data/population_enterprise.js")
+def population_enterprise_js():
+    return population_enterprise
 
 
 @app.route("/data/fire_station.js")

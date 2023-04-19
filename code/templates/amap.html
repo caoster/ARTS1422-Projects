@@ -76,12 +76,9 @@
 <script src="//a.amap.com/Loca/static/dist/jquery.min.js"></script>
 <script>
     let infoWindow, map, level = 12,
-        // center = {lng: 120.14325, lat: 30.281472}; // amap location
-        center = {
-            lat: 30.1706,
+        center = {lng: 120.14325, lat: 30.281472}; // amap location
+    // center = {lat: 30.1706, lng: 119.866875};
 
-            lng: 119.866875
-        }
     function mapFeatureClick(e) {
         if (!infoWindow) {
             infoWindow = new AMap.InfoWindow({autoMove: true, isCustom: false});
@@ -136,7 +133,26 @@
         return obj.time <= end;
     }
 
+    function initComplete(file) {
+        if (initComplete.info === undefined) {
+            initComplete.info = {
+                "fire": false,
+                "fire station": false,
+                "population & enterprise": false,
+            }
+        }
+        initComplete.info[file] = true;
 
+        if (Object.values(initComplete.info).every(value => value)) {
+            console.log("All data loaded!");
+            display_fire(inTimePeriod);
+            display_fire_station(beforeEndTime);
+            display_population(inTimePeriod);
+            display_enterprise(inTimePeriod);
+
+            drawLeftPanel();
+        }
+    }
 </script>
 
 <!-- Fire -->
@@ -145,8 +161,7 @@
         for (let fireElement of fire) {
             fireElement.time = new Date(fireElement.time)
         }
-        console.log("Fire data loaded!");
-        display_fire(inTimePeriod);
+        initComplete("fire");
     })
 
     let fireLayer = new Loca.ScatterPointLayer({
@@ -182,8 +197,7 @@
         for (let fireStationElement of fire_station) {
             fireStationElement.time = new Date(fireStationElement.time)
         }
-        console.log("Fire station data loaded!");
-        display_fire_station(beforeEndTime);
+        initComplete("fire station");
     })
 
     let fireStationLayer = new Loca.ScatterPointLayer({
@@ -215,8 +229,8 @@
 </script>
 <!-- Population & Enterprise -->
 <script>
-    loadScript("/data/population_industry.js", function () {
-        console.log("Population industry data loaded!");
+    loadScript("/data/population_enterprise.js", function () {
+        initComplete("population & enterprise");
         display_population();
         display_enterprise();
     })
@@ -237,9 +251,9 @@
         let display_population_industry_list = [];
 
         let begin_column = Math.max((begin.getFullYear() - 2007) * 12 + begin.getMonth() - 1, 0);
-        let end_column = Math.min((end.getFullYear() - 2007) * 12 + end.getMonth() - 1, (population_industry[0].length - 2) / 3 - 1);
+        let end_column = Math.min((end.getFullYear() - 2007) * 12 + end.getMonth() - 1, (population_enterprise[0].length - 2) / 3 - 1);
 
-        for (const locationElement of population_industry) {
+        for (const locationElement of population_enterprise) {
             let i = begin_column, avg = 0;
             while (i <= end_column) {
                 avg += locationElement[3 * i + 2];
@@ -275,13 +289,13 @@
         let display_population_enterprise_list = [];
 
         let begin_column = Math.max((begin.getFullYear() - 2007) * 12 + begin.getMonth() - 1, 0);
-        let end_column = Math.min((end.getFullYear() - 2007) * 12 + end.getMonth() - 1, (population_industry[0].length - 2) / 3 - 1);
+        let end_column = Math.min((end.getFullYear() - 2007) * 12 + end.getMonth() - 1, (population_enterprise[0].length - 2) / 3 - 1);
 
-        for (const locationElement of population_industry) {
+        for (const locationElement of population_enterprise) {
             let i = begin_column, max_capital = 0, max_count = 0;
             while (i <= end_column) {
                 max_capital = Math.max(max_capital, locationElement[3 * i + 3]);
-                max_count = Math.max (max_count, locationElement[3 * i + 4]);
+                max_count = Math.max(max_count, locationElement[3 * i + 4]);
                 i++;
             }
             let lng = locationElement[1], lat = locationElement[0];
