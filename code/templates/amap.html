@@ -96,7 +96,9 @@
             keyboardEnable: true,
             dragEnable: true,
             scrollWheel: true,
-            doubleClickZoom: true
+            doubleClickZoom: true,
+            resizeEnable: true,
+            zooms: [11, 14]
         });
     //    new AMap.TileLayer.RoadNet({map: map, zIndex: 2});
 
@@ -180,12 +182,12 @@
         }
         fireLayer.setData(display_fire_list, {lnglat: 'lnglat'});
         fireLayer.setOptions({
-            unit: 'px',
+            unit: 'meter',
             style: {
                 radius: function (obj) {
                     return radius_fire(obj.value.level);
                 },
-                color: 'rgb(251, 61, 95)',
+                color: 'rgba(251, 61, 95, 0.8)',
             }
         });
         fireLayer.render();
@@ -216,12 +218,12 @@
         }
         fireStationLayer.setData(display_fire_station_list, {lnglat: 'lnglat'});
         fireStationLayer.setOptions({
-            unit: 'px',
+            unit: 'meter',
             style: {
                 radius: function (obj) {
                     return radius_fire_station(obj.value.level);
                 },
-                color: 'rgb(27, 169, 101)',
+                color: 'rgba(27, 169, 101, 0.8)',
             }
         });
         fireStationLayer.render();

@@ -31,21 +31,21 @@ fire_icon.side_length = 25;
 function radius_fire(level) {
     switch (level) {
         case 1:
-            return 4;
+            return 150;
         case 2:
-            return 8;
+            return 300;
         case 3:
-            return 12;
+            return 450;
         case 4:
-            return 16;
+            return 600;
         default:
-            return 4;
+            return 150;
     }
 }
 
 function radius_fire_station(level) {
-    if (level === 1) return 8;
-    return 16;
+    if (level === 1) return 250;
+    return 500;
 }
 
 function opacity_population(data) {
