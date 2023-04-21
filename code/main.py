@@ -40,6 +40,10 @@ population_enterprise: str
 with open("static/population_enterprise.js", "r") as file:
     population_enterprise = file.read()
 
+monthly: str
+with open("static/monthly.js", "r") as file:
+    monthly = file.read()
+
 with open("token.secret") as token:
     TOKEN = token.read()
 
@@ -73,6 +77,11 @@ def proxy(path):
 @app.route("/data/population_enterprise.js")
 def population_enterprise_js():
     return population_enterprise
+
+
+@app.route("/data/monthly.js")
+def monthly_js():
+    return monthly
 
 
 @app.route("/data/fire_station.js")
