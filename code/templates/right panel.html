@@ -22,312 +22,240 @@
     //     {'year': 2007, 'month': 1, 'avg_temp': 5.5, 'amt_rain': 84.5, 'num_rain': 14, 'num_snow': 4, 'num_storm': 0, 'num_fire': 8, 'max_level_fire': 1},
     //     {'year': 2007, 'month': 2, 'avg_temp': 11.2, 'amt_rain': 56.7, 'num_rain': 10, 'num_snow': 0, 'num_storm': 0, 'num_fire': 10, 'max_level_fire': 1}
     // ];
-    let dataArr = [];
-
-    let avg_temp = [];
-    let amt_rain = [];
-    let num_rain = [];
-
-    for (let i = 0; i < monthly.length; i++) {
-        let A1 = [];
-        A1[0] = monthly[i].year + "-" + monthly[i].month;
-
-        let A2 = [];
-        A2[0] = monthly[i].avg_temp;
-        A2[1] = monthly[i].amt_rain;
-        A2[2] = monthly[i].num_rain;
-        A2[3] = monthly[i].num_snow;
-
-        A1[1] = A2;
-        dataArr.push(A1);
-        avg_temp.push([monthly[i].avg_temp]);
-        amt_rain.push([monthly[i].amt_rain]);
-        num_rain.push([monthly[i].num_rain]);
-    }
-
-    // 声明所需变量
-    let canvas, ctx; //canvas DOM    canvas上下文
-    // 图表属性
-    let cWidth, cHeight, cMargin, cSpace; //canvas中部的宽/高  canvas内边距/文字边距
-    let originX, originY; //坐标轴原点
-    // 图属性
-    let bMargin, tobalBars, bWidth, maxValue, minValue; //每个k线图间间距  数量 宽度   所有k线图的最大值/最小值
-    let totalYNomber; //y轴上的标识数量
-    let showArr; //显示出来的数据部分（因为可以选择范围，所以需要这个数据）
-
-    //范围选择属性
-    let dragBarX, dragBarWidth; //范围选择条中的调节按钮的位置，宽度
-
-    // 运动相关变量
-    let ctr, numctr, speed; //运动的起步，共有多少步，运动速度（timer的时间）
-    //鼠标移动
-    let mousePosition = {}; //用户存放鼠标位置
-
-    let point_MA5 = [];
-    let point_MA10 = [];
-    let point_MA20 = [];
-
-    goChart(document.getElementById("chart"), dataArr);
+    function drawRightUpPanel() {
 
 
-    drawLineLabelMarkers(); // 绘制图表轴、标签和标记
+        let dataArr = [];
 
-
-    drawBarAnimate(); // 绘制柱状图的动画
-
-    //绘制拖动轴
-    drawDragBar();
-
-    function drawMA(MA, i, x, type) {
-        let MAy = originY - cHeight * (MA[i] - minValue) / (maxValue - minValue);
-        if (type === "MA5") {
-            point_MA5.push({x: x + bWidth / 2, y: MAy});
-        }
-        if (type === "MA10") {
-            point_MA10.push({x: x + bWidth / 2, y: MAy});
-        }
-        if (type === "MA20") {
-            point_MA20.push({x: x + bWidth / 2, y: MAy});
-        }
-    }
-
-    // 绘制图表轴、标签和标记
-    function drawLineLabelMarkers() {
-        ctx.font = "24px Arial";
-        ctx.lineWidth = 2;
-        ctx.fillStyle = "#000000";
-        ctx.strokeStyle = "#000000";
-        // y轴
-        drawLine(originX, originY, originX, cMargin);
-        // x轴
-        drawLine(originX, originY, originX + cWidth, originY);
-        // 绘制标记
-        drawMarkers();
-    }
-
-    function drawLine(x, y, X, Y) {
-        ctx.strokeStyle = "white";
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(X, Y);
-        ctx.stroke();
-        ctx.closePath();
-    }
-
-    function drawLineWithColor(x, y, X, Y, color) {
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(X, Y);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        ctx.closePath();
-    }
-
-    // 绘制标记
-    function drawMarkers() {
-        ctx.strokeStyle = "#E0E0E0";
-        // 绘制 y
-        let oneVal = (maxValue - minValue) / totalYNomber;
-        ctx.textAlign = "right";
-        for (let i = 1; i <= totalYNomber; i++) {
-            let markerVal = parseInt(i * oneVal + minValue);
-            let xMarker = originX - 10;
-            let yMarker = parseInt(originY - cHeight * (markerVal - minValue) / (maxValue - minValue));
-            ctx.fillStyle = "white";
-            ctx.font = "22px Verdana";
-            ctx.fillText(markerVal, xMarker - 15, yMarker, cSpace); // 文字
-            if (i > 0) {
-                drawLine(originX + 1, yMarker - 3, originX - 9, yMarker - 3);
-            }
+        drawRightUpPanel.properties = {
+            'avg_temp': {'min': Number.POSITIVE_INFINITY, 'max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251,61,95,1)'},
+            'amt_rain': {'min': Number.POSITIVE_INFINITY, 'max': Number.NEGATIVE_INFINITY, 'color': 'rgba(47,69,84)'},
+            'num_rain': {'min': Number.POSITIVE_INFINITY, 'max': Number.NEGATIVE_INFINITY, 'color': 'rgba(97,160,168)'},
+            'num_snow': 0,
+            'num_storm': 0,
+            'num_fire': 10,
+            'max_level_fire': 1
         }
 
-        // 绘制 x
-        let textNb = 6;
-        ctx.textAlign = "center";
-        for (let i = 0; i < tobalBars; i++) {
-            if (tobalBars > textNb && i % parseInt(tobalBars / 10) !== 0) {
-                continue;
-            }
-            let markerVal = dataArr[i][0];
-            let xMarker = parseInt(originX + cWidth * (i / tobalBars) + bMargin + bWidth / 2);
-            let yMarker = originY + 30;
-            ctx.fillStyle = "white";
-            ctx.font = "22px Verdana";
-            ctx.fillText(markerVal, xMarker, yMarker, cSpace); // 文字
-            if (i > 0) {
-                drawLine(xMarker, originY, xMarker, originY - 10);
-            }
-        }
-        // 绘制标题 y
-        ctx.save();
-        ctx.rotate(-Math.PI / 2);
-        //ctx.fillText("指 数", -canvas.height / 2, cSpace - 20);
-        ctx.restore();
-        // 绘制标题 x
-        //ctx.fillText("日 期", originX + cWidth / 2, originY + cSpace - 20);
-    }
+        for (let i = 0; i < monthly.length; i++) {
+            let A1 = [];
+            A1[0] = monthly[i].year + "-" + monthly[i].month;
 
+            let A2 = [];
+            A2[0] = monthly[i].avg_temp;
+            A2[1] = monthly[i].amt_rain;
+            A2[2] = monthly[i].num_rain;
+            A2[3] = monthly[i].num_snow;
 
-    //绘制k形图
-    function drawBarAnimate() {
-        point_MA5 = [];
-        point_MA10 = [];
-        point_MA20 = [];
-        let parsent = ctr / numctr;
-        for (let i = 0; i < tobalBars; i++) {
-            let data = dataArr[i][1];
-            let color = "#30C7C9";
-            let barVal = data[0];
-            let disY = 0;
-            //开盘0 收盘1 最低2 最高3   跌30C7C9  涨D7797F
-            if (data[1] > data[0]) { //涨
-                color = "#D7797F";
-                barVal = data[1];
-                disY = data[1] - data[0];
-            } else {
-                disY = data[0] - data[1];
-            }
-            let showH = disY / (maxValue - minValue) * cHeight * parsent;
-            showH = showH > 2 ? showH : 2;
-
-            let barH = parseInt(cHeight * (barVal - minValue) / (maxValue - minValue));
-            let y = originY - barH;
-            let x = originX + ((bWidth + bMargin) * i + bMargin) * parsent;
-
-            drawMA(avg_temp, i, x, "MA5");
-            drawMA(amt_rain, i, x, "MA10");
-            drawMA(num_rain, i, x, "MA20");
+            A1[1] = A2;
+            dataArr.push(A1);
         }
 
+        // 声明所需变量
+        let canvas, ctx; //canvas DOM    canvas上下文
+        // 图表属性
+        let cWidth, cHeight, cMargin, cSpace; //canvas中部的宽/高  canvas内边距/文字边距
+        let originX, originY; //坐标轴原点
+        // 图属性
+        let bMargin, tobalBars, bWidth, maxValue, minValue; //每个k线图间间距  数量 宽度   所有k线图的最大值/最小值
+        let totalYNumber; //y轴上的标识数量
 
-        drawBezier(point_MA5, "rgb(194,54,49)", 5);
-        drawBezier(point_MA10, "rgb(47,69,84)", 10);
-        drawBezier(point_MA20, "rgb(97,160,168)", 20);
+        //范围选择属性
+        let dragBarX, dragBarWidth; //范围选择条中的调节按钮的位置，宽度
+
+        //鼠标移动
+        let mousePosition = {}; //用户存放鼠标位置
+
+        let point_avg_temp = [];
+        let point_amt_rain = [];
+        let point_num_rain = [];
+
+        goChart(document.getElementById("chart"));
 
 
-        if (ctr < numctr) {
-            ctr++;
-            setTimeout(function () {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawLineLabelMarkers();
-                drawBarAnimate();
-                drawDragBar();
-            }, speed *= 0.03);
+        drawLineLabelMarkers();
+
+        drawPlot();
+
+        drawDragBar();
+
+        function drawLineLabelMarkers() {
+            ctx.font = "24px Arial";
+            ctx.lineWidth = 2;
+            ctx.fillStyle = "#000000";
+            ctx.strokeStyle = "#000000";
+            drawLineWithColor(originX, originY, originX, cMargin, "white");
+            drawLineWithColor(originX, originY, originX + cWidth, originY, "white");
+            drawMarkers();
         }
 
-    }
-
-
-    function drawBezier(point, color, num) {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 10;
-        ctx.beginPath();
-        ctx.font = "20px SimSun";
-        ctx.fillStyle = "#ffffff";
-        for (let i = 0; i < point.length; i++) {
-
-            if (i < num + 2) {
-                ctx.moveTo(point[i].x, point[i].y);
-            } else { //注意是从1开始
-                let ctrlP = getCtrlPoint(point, i - 1);
-                ctx.bezierCurveTo(ctrlP.pA.x, ctrlP.pA.y, ctrlP.pB.x, ctrlP.pB.y, point[i].x, point[i].y);
-                // ctx.fillText("("+point[i].x+","+point[i].y+")",point[i].x,point[i].y);
-            }
-        }
-        ctx.stroke();
-    }
-
-
-    function getCtrlPoint(ps, i, a, b) {
-        if (!a || !b) {
-            a = 0.25;
-            b = 0.25;
-        }
-
-        let pAx, pAy, pBx, pBy;
-
-        //处理两种极端情形
-        if (i < 1) {
-            pAx = ps[0].x + (ps[1].x - ps[0].x) * a;
-            pAy = ps[0].y + (ps[1].y - ps[0].y) * a;
-        } else {
-            pAx = ps[i].x + (ps[i + 1].x - ps[i - 1].x) * a;
-            pAy = ps[i].y + (ps[i + 1].y - ps[i - 1].y) * a;
-        }
-        if (i > ps.length - 3) {
-            let last = ps.length - 1
-            pBx = ps[last].x - (ps[last].x - ps[last - 1].x) * b;
-            pBy = ps[last].y - (ps[last].y - ps[last - 1].y) * b;
-        } else {
-            pBx = ps[i + 1].x - (ps[i + 2].x - ps[i].x) * b;
-            pBy = ps[i + 1].y - (ps[i + 2].y - ps[i].y) * b;
-        }
-
-        return {
-            pA: {x: pAx, y: pAy},
-            pB: {x: pBx, y: pBy}
-        }
-    }
-
-    //绘制方块
-    function drawRect(x, y, X, Y, mouseMove, color, ifBigBar, ifDrag) {
-
-        ctx.beginPath();
-
-        if (parseInt(x) % 2 !== 0) { //避免基数像素在普通分辨率屏幕上出现方块模糊的情况
-            x += 0;
-        }
-        if (parseInt(y) % 2 !== 0) {
-            y += 0;
-        }
-        if (parseInt(X) % 2 !== 0) {
-            X += 0;
-        }
-        if (parseInt(Y) % 2 !== 0) {
-            Y += 0;
-        }
-        ctx.rect(parseInt(x), parseInt(y), parseInt(X), parseInt(Y));
-
-        if (ifBigBar && mouseMove && ctx.isPointInPath(mousePosition.x * 2, mousePosition.y * 2)) { //如果是鼠标移动的到柱状图上，重新绘制图表
+        function drawLineWithColor(x, y, X, Y, color) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(X, Y);
             ctx.strokeStyle = color;
-            ctx.strokeWidth = 20;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+
+        function drawMarkers() {
+            ctx.strokeStyle = "#E0E0E0";
+            // 绘制 y
+            let oneVal = (maxValue - minValue) / totalYNumber;
+            ctx.textAlign = "right";
+            for (let i = 1; i <= totalYNumber; i++) {
+                let markerVal = Number.parseInt(i * oneVal + minValue).toString();
+                let xMarker = originX - 10;
+                let yMarker = originY - cHeight * (markerVal - minValue) / (maxValue - minValue);
+                ctx.fillStyle = "white";
+                ctx.font = "22px Verdana";
+                ctx.fillText(markerVal, xMarker - 15, yMarker, cSpace);
+                if (i > 0) {
+                    drawLineWithColor(originX + 1, yMarker - 3, originX - 9, yMarker - 3, "white");
+                }
+            }
+
+            // 绘制 x
+            let textNb = 6;
+            ctx.textAlign = "center";
+            for (let i = 0; i < tobalBars; i++) {
+                if (tobalBars > textNb && i % parseInt(tobalBars / 10) !== 0) {
+                    continue;
+                }
+                let markerVal = dataArr[i][0];
+                let xMarker = parseInt(originX + cWidth * (i / tobalBars) + bMargin + bWidth / 2);
+                let yMarker = originY + 30;
+                ctx.fillStyle = "white";
+                ctx.font = "22px Verdana";
+                ctx.fillText(markerVal, xMarker, yMarker, cSpace); // 文字
+                if (i > 0) {
+                    drawLineWithColor(xMarker, originY, xMarker, originY - 10, "white");
+                }
+            }
+            // 绘制标题 y
+            ctx.save();
+            ctx.rotate(-Math.PI / 2);
+            //ctx.fillText("指 数", -canvas.height / 2, cSpace - 20);
+            ctx.restore();
+            // 绘制标题 x
+            //ctx.fillText("日 期", originX + cWidth / 2, originY + cSpace - 20);
+        }
+
+        function drawPlot() {
+            point_avg_temp = [];
+            point_amt_rain = [];
+            point_num_rain = [];
+            for (let i = 0; i < tobalBars; i++) {
+                let x = originX + (bWidth + bMargin) * i + bMargin;
+
+                point_avg_temp.push({x: x + bWidth / 2, y: originY - cHeight * (monthly[i].avg_temp - minValue) / (maxValue - minValue)});
+                point_amt_rain.push({x: x + bWidth / 2, y: originY - cHeight * (monthly[i].amt_rain - minValue) / (maxValue - minValue)});
+                point_num_rain.push({x: x + bWidth / 2, y: originY - cHeight * (monthly[i].num_rain - minValue) / (maxValue - minValue)});
+            }
+
+            drawBezier(point_avg_temp, "rgba(251,61,95,1)");
+            drawBezier(point_amt_rain, "rgb(47,69,84)");
+            drawBezier(point_num_rain, "rgb(97,160,168)");
+        }
+
+        function drawBezier(point, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.font = "20px SimSun";
+            ctx.fillStyle = "#ffffff";
+            for (let i = 0; i < point.length; i++) {
+                if (i === 0) {
+                    ctx.moveTo(point[i].x, point[i].y);
+                } else {
+                    let ctrlP = getCtrlPoint(point, i - 1);
+                    ctx.bezierCurveTo(ctrlP.pA.x, ctrlP.pA.y, ctrlP.pB.x, ctrlP.pB.y, point[i].x, point[i].y);
+                    // ctx.fillText("("+point[i].x+","+point[i].y+")",point[i].x,point[i].y);
+                }
+            }
             ctx.stroke();
         }
-        //如果移动到拖动选择范围按钮
-        canvas.style.cursor = "default";
-        if (ifDrag && ctx.isPointInPath(mousePosition.x * 2, mousePosition.y * 2)) { //如果是鼠标移动的到调节范围按钮上，改变鼠标样式
-            //console.log(123);
-            canvas.style.cursor = "all-scroll";
+
+
+        function getCtrlPoint(ps, i) {
+            let a = 0.25;
+            let b = 0.25;
+
+            let pAx, pAy, pBx, pBy;
+
+            if (i < 1) {
+                pAx = ps[0].x + (ps[1].x - ps[0].x) * a;
+                pAy = ps[0].y + (ps[1].y - ps[0].y) * a;
+            } else {
+                pAx = ps[i].x + (ps[i + 1].x - ps[i - 1].x) * a;
+                pAy = ps[i].y + (ps[i + 1].y - ps[i - 1].y) * a;
+            }
+            if (i > ps.length - 3) {
+                let last = ps.length - 1
+                pBx = ps[last].x - (ps[last].x - ps[last - 1].x) * b;
+                pBy = ps[last].y - (ps[last].y - ps[last - 1].y) * b;
+            } else {
+                pBx = ps[i + 1].x - (ps[i + 2].x - ps[i].x) * b;
+                pBy = ps[i + 1].y - (ps[i + 2].y - ps[i].y) * b;
+            }
+
+            return {
+                pA: {x: pAx, y: pAy},
+                pB: {x: pBx, y: pBy}
+            }
         }
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.closePath();
 
-    }
+        //绘制方块
+        function drawRect(x, y, X, Y, mouseMove, color, ifBigBar, ifDrag) {
+
+            ctx.beginPath();
+
+            if (parseInt(x) % 2 !== 0) { //避免基数像素在普通分辨率屏幕上出现方块模糊的情况
+                x += 0;
+            }
+            if (parseInt(y) % 2 !== 0) {
+                y += 0;
+            }
+            if (parseInt(X) % 2 !== 0) {
+                X += 0;
+            }
+            if (parseInt(Y) % 2 !== 0) {
+                Y += 0;
+            }
+            ctx.rect(parseInt(x), parseInt(y), parseInt(X), parseInt(Y));
+
+            if (ifBigBar && mouseMove && ctx.isPointInPath(mousePosition.x * 2, mousePosition.y * 2)) { //如果是鼠标移动的到柱状图上，重新绘制图表
+                ctx.strokeStyle = color;
+                ctx.strokeWidth = 20;
+                ctx.stroke();
+            }
+            //如果移动到拖动选择范围按钮
+            canvas.style.cursor = "default";
+            if (ifDrag && ctx.isPointInPath(mousePosition.x * 2, mousePosition.y * 2)) { //如果是鼠标移动的到调节范围按钮上，改变鼠标样式
+                canvas.style.cursor = "all-scroll";
+            }
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.closePath();
+
+        }
 
 
-    function drawDragBar() {
-        drawRect(originX, originY + cSpace, cWidth, cMargin, false, "white");
-        drawRect(originX, originY + cSpace, dragBarX - originX, cMargin, false, "rgb(87,93,110)");
-        drawRect(dragBarX, originY + cSpace, dragBarWidth, cMargin, false, "red", false, true);
-    }
+        function drawDragBar() {
+            drawRect(originX, originY + cSpace, cWidth, cMargin, false, "white");
+            drawRect(originX, originY + cSpace, dragBarX - originX, cMargin, false, "rgb(87,93,110)");
+            drawRect(dragBarX, originY + cSpace, dragBarWidth, cMargin, false, "red", false, true);
+        }
 
-    function goChart(cBox, dataArr) {
+        function goChart(cBox) {
 
-
-        // 创建canvas并获得canvas上下文
-        canvas = document.createElement("canvas");
-        if (canvas && canvas.getContext) {
+            canvas = document.createElement("canvas");
             ctx = canvas.getContext("2d");
-        }
 
-        cBox.appendChild(canvas);
+            cBox.appendChild(canvas);
 
-        initChart(); // 图表初始化
-
-        // 图表初始化
-        function initChart() {
             // 图表信息
             cMargin = 40;
             cSpace = 80;
@@ -341,189 +269,163 @@
             originX = cMargin + cSpace;
             originY = cMargin + cHeight;
 
-            showArr = dataArr.slice(0, parseInt(dataArr.length));
-
-
             // 柱状图信息
-            tobalBars = showArr.length;
+            tobalBars = dataArr.length;
             bWidth = cWidth / tobalBars / 3;
             bMargin = (cWidth - bWidth * tobalBars) / (tobalBars + 1);
             //算最大值，最小值
             maxValue = 0;
             minValue = 9999999;
             for (let i = 0; i < dataArr.length; i++) {
-                console.log(dataArr)
-                let barVal = dataArr[i][1][3];
-
-                if (barVal > maxValue) {
-                    maxValue = barVal;
-                }
-                let barVal2 = dataArr[i][1][2];
-                if (barVal2 < minValue) {
-                    minValue = barVal2;
-                }
-
+                maxValue = 98;
+                minValue = 0;
             }
             maxValue += 2; //上面预留20的空间
             minValue -= 2; //下面预留20的空间
-            totalYNomber = 10;
-            // 运动相关
-            ctr = 1;
-            numctr = 20;
-            speed = 0;
+            totalYNumber = 10;
 
             dragBarWidth = 10;
             dragBarX = cWidth + cSpace + cMargin - dragBarWidth;
         }
-    }
 
-    //检测鼠标移动
-    let mouseTimer = null;
-    addMouseMove();
+        //检测鼠标移动
+        let mouseTimer = null;
+        addMouseMove();
 
-    function addMouseMove() {
-        canvas.addEventListener("mousemove", function (e) {
-            let parsent = ctr / numctr;
-            let x = event.pageX - canvas.getBoundingClientRect().left - 60;
-            let y = -event.pageY + canvas.getBoundingClientRect().top + 400;
-            if (y > 0 && x > 0) {
-                let positionx = 1;
-                for (let i = 0; i < tobalBars; i++) {
-                    if (x >= (1080 / tobalBars) * i) {
-                        positionx = i + 1;
+        function addMouseMove() {
+            canvas.addEventListener("mousemove", function (e) {
+                let x = event.pageX - canvas.getBoundingClientRect().left - 60;
+                let y = -event.pageY + canvas.getBoundingClientRect().top + 400;
+                if (y > 0 && x > 0) {
+                    let positionx = 1;
+                    for (let i = 0; i < tobalBars; i++) {
+                        if (x >= (1080 / tobalBars) * i) {
+                            positionx = i + 1;
+                        }
                     }
-                }
-                let xx = originX + ((bWidth + bMargin) * (positionx - 1) + bMargin) * parsent;
+                    let xx = originX + ((bWidth + bMargin) * (positionx - 1) + bMargin);
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawLineLabelMarkers();
-                drawBarAnimate();
-                drawDragBar();
-                drawLineWithColor(xx + bWidth / 2 - 1, 40, xx + bWidth / 2 - 1, 800);
-                drawDashLine(ctx, 120, canvas.getBoundingClientRect().top + event.pageY * 2 - 90, 760 * 3, canvas.getBoundingClientRect().top + event.pageY * 2 - 90, 5);
-
-
-                let vx = 10;
-                let vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 - 20;
-                ctx.beginPath();
-                ctx.moveTo(vx, vy);
-                ctx.lineTo(vx + 100, vy);
-                ctx.lineTo(vx + 100, vy + 40);
-                ctx.lineTo(vx, vy + 40);
-                ctx.lineTo(vx, vy); //绘制最后一笔使图像闭合
-                ctx.lineWidth = 2;
-                ctx.fillStyle = "rgb(104,113,130)";
-                ctx.fill();
-                ctx.stroke();
-
-
-                let ch = parseFloat((maxValue - minValue) * y * 2 / cHeight + minValue).toFixed(2);
-
-                ctx.fillStyle = "white";
-                ctx.fillText(ch, vx + 50, vy + 30, 50); // 文字
-
-
-                vx = xx + bWidth / 2 - 1 + 20;
-                vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 + 20;
-                ctx.beginPath();
-                ctx.moveTo(vx, vy);
-                ctx.lineTo(vx + 200, vy);
-                ctx.lineTo(vx + 200, vy + 330);
-                ctx.lineTo(vx, vy + 330);
-                ctx.lineTo(vx, vy); //绘制最后一笔使图像闭合
-                ctx.lineWidth = 2;
-                ctx.fillStyle = "rgba(104,113,130,0.5)";
-                ctx.fill();
-                ctx.stroke();
-
-                ctx.fillStyle = "white";
-                ctx.textAlign = "left";
-                ctx.fillText(dataArr[positionx - 1][0], vx + 20, vy + 30, 150); // 文字
-                ctx.fillText("开盘价：" + dataArr[positionx - 1][1][0], vx + 20, vy + 70, 150); // 文字
-                ctx.fillText("收盘价：" + dataArr[positionx - 1][1][1], vx + 20, vy + 105, 150); // 文字
-                ctx.fillText("最高价：" + dataArr[positionx - 1][1][2], vx + 20, vy + 140, 150); // 文字
-                ctx.fillText("最低价：" + dataArr[positionx - 1][1][3], vx + 20, vy + 175, 150); // 文字
-                ctx.fillText("MA5：" + avg_temp[positionx - 1], vx + 20, vy + 210, 150); // 文字
-                ctx.fillText("MA10：" + amt_rain[positionx - 1], vx + 20, vy + 245, 150); // 文字
-                ctx.fillText("MA20：" + num_rain[positionx - 1], vx + 20, vy + 280, 150); // 文字
-
-
-            } else {
-                e = e || window.event;
-                if (e.offsetX || e.offsetX === 0) {
-                    mousePosition.x = e.offsetX;
-                    mousePosition.y = e.offsetY;
-                } else if (e.layerX || e.layerX === 0) {
-                    mousePosition.x = e.layerX;
-                    mousePosition.y = e.layerY;
-                }
-
-                clearTimeout(mouseTimer);
-                mouseTimer = setTimeout(function () {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     drawLineLabelMarkers();
-                    drawBarAnimate();
+                    drawPlot();
                     drawDragBar();
-                }, 10);
-            }
+                    drawLineWithColor(xx + bWidth / 2 - 1, 40, xx + bWidth / 2 - 1, 800);
+                    drawDashLine(ctx, 120, canvas.getBoundingClientRect().top + event.pageY * 2 - 90, 760 * 3, canvas.getBoundingClientRect().top + event.pageY * 2 - 90, 5);
 
 
-        });
-    }
+                    let vx = 10;
+                    let vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 - 20;
+                    ctx.beginPath();
+                    ctx.moveTo(vx, vy);
+                    ctx.lineTo(vx + 100, vy);
+                    ctx.lineTo(vx + 100, vy + 40);
+                    ctx.lineTo(vx, vy + 40);
+                    ctx.lineTo(vx, vy);
+                    ctx.lineWidth = 2;
+                    ctx.fillStyle = "rgb(104,113,130)";
+                    ctx.fill();
+                    ctx.stroke();
 
 
-    //监听拖拽
-    canvas.onmousedown = function (e) {
+                    let ch = parseFloat((maxValue - minValue) * y * 2 / cHeight + minValue).toFixed(2);
 
-        document.onmousemove = function (e) {
-            if (e.offsetX || e.offsetX === 0) {
-                dragBarX = e.offsetX * 2 - dragBarWidth / 2;
-            } else if (e.layerX || e.layerX === 0) {
-                dragBarX = e.layerX * 2 - dragBarWidth / 2;
-            }
-
-            if (dragBarX <= originX) {
-                dragBarX = originX
-            }
-            if (dragBarX > originX + cWidth - dragBarWidth) {
-                dragBarX = originX + cWidth - dragBarWidth
-            }
-
-            let nb = Math.ceil(dataArr.length * ((dragBarX - cMargin - cSpace) / cWidth));
-            showArr = dataArr.slice(0, nb || 1);
-
-            // 柱状图信息
-            tobalBars = showArr.length;
-            bWidth = cWidth / tobalBars / 3;
-            bMargin = (cWidth - bWidth * tobalBars) / (tobalBars + 1);
+                    ctx.fillStyle = "white";
+                    ctx.fillText(ch, vx + 50, vy + 30, 50); // 文字
 
 
+                    vx = xx + bWidth / 2 - 1 + 20;
+                    vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 + 20;
+                    ctx.beginPath();
+                    ctx.moveTo(vx, vy);
+                    ctx.lineTo(vx + 200, vy);
+                    ctx.lineTo(vx + 200, vy + 330);
+                    ctx.lineTo(vx, vy + 330);
+                    ctx.lineTo(vx, vy);
+                    ctx.lineWidth = 2;
+                    ctx.fillStyle = "rgba(104,113,130,0.5)";
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = "white";
+                    ctx.textAlign = "left";
+                    // ctx.fillText(dataArr[positionx - 1][0], vx + 20, vy + 30, 150);
+                    // ctx.fillText("开盘价：" + dataArr[positionx - 1][1][0], vx + 20, vy + 70, 150);
+                    // ctx.fillText("收盘价：" + dataArr[positionx - 1][1][1], vx + 20, vy + 105, 150);
+                    // ctx.fillText("最高价：" + dataArr[positionx - 1][1][2], vx + 20, vy + 140, 150);
+                    // ctx.fillText("最低价：" + dataArr[positionx - 1][1][3], vx + 20, vy + 175, 150);
+                    ctx.fillText("平均气温：" + monthly[positionx - 1].avg_temp, vx + 20, vy + 210, 150);
+                    ctx.fillText("降雨量：" + monthly[positionx - 1].amt_rain, vx + 20, vy + 245, 150);
+                    ctx.fillText("降雨天数：" + monthly[positionx - 1].num_rain, vx + 20, vy + 280, 150);
+
+
+                } else {
+                    e = e || window.event;
+                    if (e.offsetX || e.offsetX === 0) {
+                        mousePosition.x = e.offsetX;
+                        mousePosition.y = e.offsetY;
+                    } else if (e.layerX || e.layerX === 0) {
+                        mousePosition.x = e.layerX;
+                        mousePosition.y = e.layerY;
+                    }
+
+                    clearTimeout(mouseTimer);
+                    mouseTimer = setTimeout(function () {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        drawLineLabelMarkers();
+                        drawPlot();
+                        drawDragBar();
+                    }, 10);
+                }
+
+
+            });
         }
 
-        document.onmouseup = function () {
-            document.onmousemove = null;
-            document.onmouseup = null;
+        canvas.onmousedown = function (e) {
+
+            document.onmousemove = function (e) {
+                if (e.offsetX || e.offsetX === 0) {
+                    dragBarX = e.offsetX * 2 - dragBarWidth / 2;
+                } else if (e.layerX || e.layerX === 0) {
+                    dragBarX = e.layerX * 2 - dragBarWidth / 2;
+                }
+
+                if (dragBarX <= originX) {
+                    dragBarX = originX
+                }
+                if (dragBarX > originX + cWidth - dragBarWidth) {
+                    dragBarX = originX + cWidth - dragBarWidth
+                }
+
+                tobalBars = Math.ceil(dataArr.length * ((dragBarX - cMargin - cSpace) / cWidth));
+                bWidth = cWidth / tobalBars / 3;
+                bMargin = (cWidth - bWidth * tobalBars) / (tobalBars + 1);
+            }
+
+            document.onmouseup = function () {
+                document.onmousemove = null;
+                document.onmouseup = null;
+            }
+        }
+
+        function getBeveling(x, y) {
+            return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        }
+
+        function drawDashLine(context, x1, y1, x2, y2, dashLen) {
+            dashLen = dashLen === undefined ? 5 : dashLen;
+            //得到斜边的总长度
+            let beveling = getBeveling(x2 - x1, y2 - y1);
+            //计算有多少个线段
+            let num = Math.floor(beveling / dashLen);
+
+            for (let i = 0; i < num; i++) {
+                context[i % 2 === 0 ? 'moveTo' : 'lineTo'](x1 + (x2 - x1) / num * i, y1 + (y2 - y1) / num * i);
+            }
+            context.stroke();
         }
     }
-
-
-    function getBeveling(x, y) {
-        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-    }
-
-    function drawDashLine(context, x1, y1, x2, y2, dashLen) {
-        dashLen = dashLen === undefined ? 5 : dashLen;
-        //得到斜边的总长度
-        let beveling = getBeveling(x2 - x1, y2 - y1);
-        //计算有多少个线段
-        let num = Math.floor(beveling / dashLen);
-
-        for (let i = 0; i < num; i++) {
-            context[i % 2 === 0 ? 'moveTo' : 'lineTo'](x1 + (x2 - x1) / num * i, y1 + (y2 - y1) / num * i);
-        }
-        context.stroke();
-    }
-
+    drawRightUpPanel();
 </script>
 </body>
 
