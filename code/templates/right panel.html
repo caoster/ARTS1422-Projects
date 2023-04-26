@@ -18,20 +18,19 @@
 <div id="chart" height="500" width="1200" style="margin:30px;"></div>
 <script src="http://192.168.1.100:5000/static/monthly.js"></script>
 <script type="text/javascript">
+    let begin = new Date();
+    begin.setFullYear(2020);
+    begin.setMonth(7);
+    let end = new Date();
+    end.setFullYear(2021);
+    end.setMonth(1);
     // [
     //     {'year': 2007, 'month': 1, 'avg_temp': 5.5, 'amt_rain': 84.5, 'num_rain': 14, 'num_snow': 4, 'num_storm': 0, 'num_fire': 8, 'max_level_fire': 1},
     //     {'year': 2007, 'month': 2, 'avg_temp': 11.2, 'amt_rain': 56.7, 'num_rain': 10, 'num_snow': 0, 'num_storm': 0, 'num_fire': 10, 'max_level_fire': 1}
     // ];
     function drawRightUpPanel() {
 
-
-        let dataArr = [];
-
         let mousePosition = {}; //用户存放鼠标位置
-
-        let point_avg_temp = [];
-        let point_amt_rain = [];
-        let point_num_rain = [];
 
         let canvas = document.createElement("canvas");
         let ctx = canvas.getContext("2d");
@@ -39,7 +38,7 @@
         let cBox = document.getElementById("chart");
         cBox.appendChild(canvas);
 
-        let cMargin = 40;
+        let cMargin = 20;
         let cSpace = 80;
 
         canvas.width = cBox.getAttribute("width") * 2;
@@ -55,23 +54,30 @@
         let totalBars = monthly.length;
         let bWidth = cWidth / totalBars / 3;
         let bMargin = (cWidth - bWidth * totalBars) / (totalBars + 1);
-        let maxValue = 200;
-        let minValue = 0;
-        let totalYNumber = 10;
+        let totalXNumber = 5;
 
         let dragBarWidth = 10;
         let dragBarX = cWidth + cSpace + cMargin - dragBarWidth;
 
 
         drawRightUpPanel.properties = {
-            'avg_temp': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)'},
-            'amt_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(47, 69, 84, 1)'},
-            'num_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(97, 160, 168, 1)'},
-            'num_snow': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(97, 160, 168, 1)'},
-            'num_storm': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)'},
-            'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)'},
-            'max_level_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)'},
+            'avg_temp': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false},
+            'amt_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(47, 69, 84, 1)', 'show': false},
+            'num_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(97, 160, 168, 1)', 'show': false},
+            'num_snow': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(97, 160, 168, 1)', 'show': false},
+            'num_storm': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false},
+            'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false},
+            'max_level_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false},
         }
+        drawRightUpPanel.property_list = [
+            'avg_temp',
+            'amt_rain',
+            'num_rain',
+            'num_snow',
+            'num_storm',
+            'num_fire',
+            'max_level_fire'
+        ]
 
         drawRightUpPanel.points = {
             'avg_temp': [],
@@ -110,7 +116,6 @@
             }
             Object.keys(drawRightUpPanel.properties).forEach(key => {
                 let diff = 0.05 * (drawRightUpPanel.properties[key].rng_max - drawRightUpPanel.properties[key].rng_min);
-                console.log(diff)
                 drawRightUpPanel.properties[key].rng_max += diff;
                 drawRightUpPanel.properties[key].rng_min -= diff;
             });
@@ -127,36 +132,49 @@
                 points.num_fire.push({x: x, y: originY - cHeight * (monthly[i].num_fire - prop.num_fire.rng_min) / (prop.num_fire.rng_max - prop.num_fire.rng_min)});
                 points.max_level_fire.push({x: x, y: originY - cHeight * (monthly[i].max_level_fire - prop.max_level_fire.rng_min) / (prop.max_level_fire.rng_max - prop.max_level_fire.rng_min)});
             }
+            drawLineLabelMarkers();
+            drawPlot();
+            drawTime();
+            drawDragBar();
         }
 
-        for (let i = 0; i < monthly.length; i++) {
-            let A1 = [];
-            A1[0] = monthly[i].year + "-" + monthly[i].month;
 
-            let A2 = [];
-            A2[0] = monthly[i].avg_temp;
-            A2[1] = monthly[i].amt_rain;
-            A2[2] = monthly[i].num_rain;
-            A2[3] = monthly[i].num_snow;
+        function drawTime() {
+            let radius = 15;
+            if (begin.getTime() === end.getTime()) {
+                let x = originX + (bWidth + bMargin) * getIdx(begin) + bMargin + bWidth / 2;
+                drawLineWithColor(x + bWidth / 2 - 1, cMargin, x + bWidth / 2 - 1, originY, "rgb(255, 255, 255, 0.7)");
+                drawFilledCircleWithColor(x + bWidth / 2 - 1, cMargin, radius, "rgb(255, 255, 255, 0.7)");
+            } else {
+                let x1 = originX + (bWidth + bMargin) * getIdx(begin) + bMargin + bWidth / 2;
+                let x2 = originX + (bWidth + bMargin) * getIdx(end) + bMargin + bWidth / 2;
+                drawRect(x1 + bWidth / 2 - 1, cMargin, x2 - x1, originY - cMargin, false, "rgb(255, 255, 255, 0.7)", true);
 
-            A1[1] = A2;
-            dataArr.push(A1);
+                drawLineWithColor(x1 + bWidth / 2 - 1, cMargin, x1 + bWidth / 2 - 1, originY, "rgb(255, 255, 255, 0.7)");
+                drawFilledCircleWithColor(x1 + bWidth / 2 - 1, cMargin, radius, "rgb(255, 255, 255, 1)");
+
+                drawLineWithColor(x2 + bWidth / 2 - 1, cMargin, x2 + bWidth / 2 - 1, originY, "rgb(255, 255, 255, 0.7)");
+                drawFilledCircleWithColor(x2 + bWidth / 2 - 1, cMargin, radius, "rgb(255, 255, 255, 1)");
+            }
+
+            function getIdx(timestamp) {
+                for (let i = 0; i < monthly.length; i++) {
+                    if (timestamp.getFullYear() <= monthly[i].year && timestamp.getMonth() <= monthly[i].month) {
+                        return i;
+                    }
+                }
+                return monthly.length - 1;
+            }
         }
-
-        drawLineLabelMarkers();
-
-        drawPlot();
-
-        drawDragBar();
 
         function drawLineLabelMarkers() {
             ctx.font = "24px Arial";
             ctx.lineWidth = 2;
             ctx.fillStyle = "#000000";
             ctx.strokeStyle = "#000000";
-            drawLineWithColor(originX, originY, originX, cMargin, "white");
             drawLineWithColor(originX, originY, originX + cWidth, originY, "white");
-            drawMarkers();
+            drawLineWithColor(originX, cMargin, originX + cWidth, cMargin, "white");
+            drawXMarkers();
         }
 
         function drawLineWithColor(x, y, X, Y, color) {
@@ -169,65 +187,38 @@
             ctx.closePath();
         }
 
+        function drawFilledCircleWithColor(x, y, radius, color) {
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.fill();
+        }
 
-        function drawMarkers() {
+
+        function drawXMarkers() {
             ctx.strokeStyle = "#E0E0E0";
-            // 绘制 y
-            let oneVal = (maxValue - minValue) / totalYNumber;
-            ctx.textAlign = "right";
-            for (let i = 1; i <= totalYNumber; i++) {
-                let markerVal = Number.parseInt(i * oneVal + minValue).toString();
-                let xMarker = originX - 10;
-                let yMarker = originY - cHeight * (markerVal - minValue) / (maxValue - minValue);
-                ctx.fillStyle = "white";
-                ctx.font = "22px Verdana";
-                ctx.fillText(markerVal, xMarker - 15, yMarker, cSpace);
-                if (i > 0) {
-                    drawLineWithColor(originX + 1, yMarker - 3, originX - 9, yMarker - 3, "white");
-                }
-            }
-
-            // 绘制 x
-            let textNb = 6;
             ctx.textAlign = "center";
             for (let i = 0; i < totalBars; i++) {
-                if (totalBars > textNb && i % parseInt(totalBars / 10) !== 0) {
-                    continue;
-                }
-                let markerVal = dataArr[i][0];
-                let xMarker = parseInt(originX + cWidth * (i / totalBars) + bMargin + bWidth / 2);
-                let yMarker = originY + 30;
-                ctx.fillStyle = "white";
-                ctx.font = "22px Verdana";
-                ctx.fillText(markerVal, xMarker, yMarker, cSpace); // 文字
-                if (i > 0) {
-                    drawLineWithColor(xMarker, originY, xMarker, originY - 10, "white");
+                if (i % parseInt(totalBars / totalXNumber) === 0) {
+                    let markerVal = monthly[i].year + '-' + monthly[i].month;
+                    let xMarker = parseInt(originX + cWidth * (i / totalBars) + bMargin + bWidth / 2);
+                    let yMarker = originY + 30;
+                    ctx.fillStyle = "white";
+                    ctx.font = "22px Verdana";
+                    ctx.fillText(markerVal, xMarker, yMarker, cSpace);
+                    if (i > 0) {
+                        drawLineWithColor(xMarker, originY, xMarker, originY - 10, "white");
+                    }
                 }
             }
-            // 绘制标题 y
-            ctx.save();
-            ctx.rotate(-Math.PI / 2);
-            //ctx.fillText("指 数", -canvas.height / 2, cSpace - 20);
-            ctx.restore();
-            // 绘制标题 x
-            //ctx.fillText("日 期", originX + cWidth / 2, originY + cSpace - 20);
         }
 
         function drawPlot() {
-            point_avg_temp = [];
-            point_amt_rain = [];
-            point_num_rain = [];
-            for (let i = 0; i < totalBars; i++) {
-                let x = originX + (bWidth + bMargin) * i + bMargin;
-
-                point_avg_temp.push({x: x + bWidth / 2, y: originY - cHeight * (monthly[i].avg_temp - minValue) / (maxValue - minValue)});
-                point_amt_rain.push({x: x + bWidth / 2, y: originY - cHeight * (monthly[i].amt_rain - minValue) / (maxValue - minValue)});
-                point_num_rain.push({x: x + bWidth / 2, y: originY - cHeight * (monthly[i].num_rain - minValue) / (maxValue - minValue)});
+            for (const propertyListKey of drawRightUpPanel.property_list) {
+                let color = drawRightUpPanel.properties[propertyListKey].color;
+                if (!drawRightUpPanel.properties[propertyListKey].show) color = color.replace(/[^,]+(?=\))/, " 0.1");
+                drawBezier(drawRightUpPanel.points[propertyListKey], color);
             }
-
-            drawBezier(point_avg_temp, "rgba(251,61,95,1)");
-            drawBezier(point_amt_rain, "rgb(47,69,84)");
-            drawBezier(point_num_rain, "rgb(97,160,168)");
         }
 
         function drawBezier(point, color) {
@@ -278,33 +269,17 @@
         }
 
         //绘制方块
-        function drawRect(x, y, X, Y, mouseMove, color, ifBigBar, ifDrag) {
+        function drawRect(x, y, X, Y, mouseMove, color, ifDrag) {
 
             ctx.beginPath();
-
-            if (parseInt(x) % 2 !== 0) { //避免基数像素在普通分辨率屏幕上出现方块模糊的情况
-                x += 0;
-            }
-            if (parseInt(y) % 2 !== 0) {
-                y += 0;
-            }
-            if (parseInt(X) % 2 !== 0) {
-                X += 0;
-            }
-            if (parseInt(Y) % 2 !== 0) {
-                Y += 0;
-            }
             ctx.rect(parseInt(x), parseInt(y), parseInt(X), parseInt(Y));
 
-            if (ifBigBar && mouseMove && ctx.isPointInPath(mousePosition.x * 2, mousePosition.y * 2)) { //如果是鼠标移动的到柱状图上，重新绘制图表
-                ctx.strokeStyle = color;
-                ctx.strokeWidth = 20;
-                ctx.stroke();
-            }
-            //如果移动到拖动选择范围按钮
-            canvas.style.cursor = "default";
             if (ifDrag && ctx.isPointInPath(mousePosition.x * 2, mousePosition.y * 2)) { //如果是鼠标移动的到调节范围按钮上，改变鼠标样式
+                console.log(123)
+                canvas.style.cursor = "ew-resize";
                 canvas.style.cursor = "all-scroll";
+            } else if (ifDrag) {
+                canvas.style.cursor = "default";
             }
             ctx.fillStyle = color;
             ctx.fill();
@@ -319,18 +294,19 @@
             drawRect(dragBarX, originY + cSpace, dragBarWidth, cMargin, false, "red", false, true);
         }
 
-        //检测鼠标移动
-        let mouseTimer = null;
         addMouseMove();
 
         function addMouseMove() {
             canvas.addEventListener("mousemove", function (e) {
-                let x = event.pageX - canvas.getBoundingClientRect().left - 60;
-                let y = -event.pageY + canvas.getBoundingClientRect().top + 400;
+                mousePosition.x = e.offsetX;
+                mousePosition.y = e.offsetY;
+
+                let x = e.offsetX - originX / 2;
+                let y = e.offsetY - cMargin / 2;
                 if (y > 0 && x > 0) {
                     let positionx = 1;
                     for (let i = 0; i < totalBars; i++) {
-                        if (x >= (1080 / totalBars) * i) {
+                        if (x >= (cWidth / 2 / totalBars) * i) {
                             positionx = i + 1;
                         }
                     }
@@ -339,33 +315,14 @@
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     drawLineLabelMarkers();
                     drawPlot();
+                    drawTime();
                     drawDragBar();
-                    drawLineWithColor(xx + bWidth / 2 - 1, 40, xx + bWidth / 2 - 1, 800);
-                    drawDashLine(ctx, 120, canvas.getBoundingClientRect().top + event.pageY * 2 - 90, 760 * 3, canvas.getBoundingClientRect().top + event.pageY * 2 - 90, 5);
+                    drawLineWithColor(xx + bWidth / 2 - 1, cMargin, xx + bWidth / 2 - 1, cMargin + cHeight, "white");
+                    drawDashLine(ctx, 110, canvas.getBoundingClientRect().top + event.pageY * 2 - 90, 760 * 3 + 10, canvas.getBoundingClientRect().top + event.pageY * 2 - 90, 5);
 
 
-                    let vx = 10;
-                    let vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 - 20;
-                    ctx.beginPath();
-                    ctx.moveTo(vx, vy);
-                    ctx.lineTo(vx + 100, vy);
-                    ctx.lineTo(vx + 100, vy + 40);
-                    ctx.lineTo(vx, vy + 40);
-                    ctx.lineTo(vx, vy);
-                    ctx.lineWidth = 2;
-                    ctx.fillStyle = "rgb(104,113,130)";
-                    ctx.fill();
-                    ctx.stroke();
-
-
-                    let ch = parseFloat((maxValue - minValue) * y * 2 / cHeight + minValue).toFixed(2);
-
-                    ctx.fillStyle = "white";
-                    ctx.fillText(ch, vx + 50, vy + 30, 50); // 文字
-
-
-                    vx = xx + bWidth / 2 - 1 + 20;
-                    vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 + 20;
+                    let vx = xx + bWidth / 2 - 1 + 20;
+                    let vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 + 20;
                     ctx.beginPath();
                     ctx.moveTo(vx, vy);
                     ctx.lineTo(vx + 200, vy);
@@ -399,13 +356,11 @@
                         mousePosition.y = e.layerY;
                     }
 
-                    clearTimeout(mouseTimer);
-                    mouseTimer = setTimeout(function () {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        drawLineLabelMarkers();
-                        drawPlot();
-                        drawDragBar();
-                    }, 10);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    drawLineLabelMarkers();
+                    drawPlot();
+                    drawTime();
+                    drawDragBar();
                 }
 
 
@@ -428,9 +383,20 @@
                     dragBarX = originX + cWidth - dragBarWidth
                 }
 
-                totalBars = Math.ceil(dataArr.length * ((dragBarX - cMargin - cSpace) / cWidth));
                 bWidth = cWidth / totalBars / 3;
                 bMargin = (cWidth - bWidth * totalBars) / (totalBars + 1);
+
+
+                let x = event.pageX - canvas.getBoundingClientRect().left - 60;
+                let y = -event.pageY + canvas.getBoundingClientRect().top + 400;
+                if (y > 0 && x > 0) {
+                    let positionx = 1;
+                    for (let i = 0; i < tobalBars; i++) {
+                        if (x >= (1080 / tobalBars) * i) {
+                            positionx = i + 1;
+                        }
+                    }
+                }
             }
 
             document.onmouseup = function () {
