@@ -14,8 +14,7 @@ function drawLeftPanel() {
             "population": true,
             "enterprise": false,
             "select": false
-        }
-        console.log(drawLeftPanel.settings)
+        };
         drawLeftPanel.canvas.addEventListener("click", (event) => {
             if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.fire_button, event.offsetX, event.offsetY)) drawLeftPanel.settings.fire = !drawLeftPanel.settings.fire;
             else if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.fire_station_button, event.offsetX, event.offsetY)) drawLeftPanel.settings.fire_station = !drawLeftPanel.settings.fire_station;
@@ -183,5 +182,440 @@ function drawLeftPanel() {
         drawLeftPanel.ctx.stroke(path);
         drawLeftPanel.ctx.fill(path);
         return path;
+    }
+}
+
+function drawRightUpPanel() {
+    let mousePosition = {};
+
+    let canvas = document.createElement("canvas");
+    canvas.width = 600 * 2;
+    canvas.height = 400 * 2;
+    canvas.style.margin = "30px";
+    canvas.id = "right-panel-bg";
+    let ctx = canvas.getContext("2d");
+
+    let cBox = document.getElementById("right-panel");
+    cBox.appendChild(canvas);
+
+    let cMargin = 20;
+    let cSpace = 80;
+
+    canvas.style.height = canvas.height / 2 + "px";
+    canvas.style.width = canvas.width / 2 + "px";
+    let cHeight = canvas.height - cMargin * 2 - cSpace * 2;
+    let cWidth = canvas.width - cMargin * 2 - cSpace * 2;
+    let originX = cMargin + cSpace;
+    let originY = cMargin + cHeight;
+
+    // 柱状图信息
+    let totalBars = monthly.length;
+    let bWidth = cWidth / totalBars / 3;
+    let bMargin = (cWidth - bWidth * totalBars) / (totalBars + 1);
+    let totalXNumber = 5;
+
+    drawRightUpPanel.properties = {
+        'avg_temp': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false, 'clickObj': undefined},
+        'amt_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(47, 69, 84, 1)', 'show': false, 'clickObj': undefined},
+        'num_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(97, 160, 168, 1)', 'show': false, 'clickObj': undefined},
+        'num_snow': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false, 'clickObj': undefined},
+        'num_storm': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false, 'clickObj': undefined},
+        'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false, 'clickObj': undefined},
+        'max_level_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false, 'clickObj': undefined},
+    }
+    drawRightUpPanel.property_list = [
+        'avg_temp',
+        'amt_rain',
+        'num_rain',
+        'num_snow',
+        'num_storm',
+        'num_fire',
+        'max_level_fire'
+    ]
+
+    drawRightUpPanel.points = {
+        'avg_temp': [],
+        'amt_rain': [],
+        'num_rain': [],
+        'num_snow': [],
+        'num_storm': [],
+        'num_fire': [],
+        'max_level_fire': [],
+    }
+    loaded();
+
+    function loaded() {
+        let prop = drawRightUpPanel.properties;
+        for (const monthlyElement of monthly) {
+            prop.avg_temp.rng_max = Math.max(prop.avg_temp.rng_max, monthlyElement.avg_temp);
+            prop.avg_temp.rng_min = Math.min(prop.avg_temp.rng_min, monthlyElement.avg_temp);
+
+            prop.amt_rain.rng_max = Math.max(prop.amt_rain.rng_max, monthlyElement.amt_rain);
+            prop.amt_rain.rng_min = Math.min(prop.amt_rain.rng_min, monthlyElement.amt_rain);
+
+            prop.num_rain.rng_max = Math.max(prop.num_rain.rng_max, monthlyElement.num_rain);
+            prop.num_rain.rng_min = Math.min(prop.num_rain.rng_min, monthlyElement.num_rain);
+
+            prop.num_snow.rng_max = Math.max(prop.num_snow.rng_max, monthlyElement.num_snow);
+            prop.num_snow.rng_min = Math.min(prop.num_snow.rng_min, monthlyElement.num_snow);
+
+            prop.num_storm.rng_max = Math.max(prop.num_storm.rng_max, monthlyElement.num_storm);
+            prop.num_storm.rng_min = Math.min(prop.num_storm.rng_min, monthlyElement.num_storm);
+
+            prop.num_fire.rng_max = Math.max(prop.num_fire.rng_max, monthlyElement.num_fire);
+            prop.num_fire.rng_min = Math.min(prop.num_fire.rng_min, monthlyElement.num_fire);
+
+            prop.max_level_fire.rng_max = Math.max(prop.max_level_fire.rng_max, monthlyElement.max_level_fire);
+            prop.max_level_fire.rng_min = Math.min(prop.max_level_fire.rng_min, monthlyElement.max_level_fire);
+        }
+        Object.keys(drawRightUpPanel.properties).forEach(key => {
+            let diff = 0.05 * (drawRightUpPanel.properties[key].rng_max - drawRightUpPanel.properties[key].rng_min);
+            drawRightUpPanel.properties[key].rng_max += diff;
+            drawRightUpPanel.properties[key].rng_min -= diff;
+        });
+
+        let points = drawRightUpPanel.points;
+        for (let i = 0; i < monthly.length; i++) {
+            let x = originX + (bWidth + bMargin) * i + bMargin + bWidth / 2;
+
+            points.avg_temp.push({x: x, y: originY - cHeight * (monthly[i].avg_temp - prop.avg_temp.rng_min) / (prop.avg_temp.rng_max - prop.avg_temp.rng_min)});
+            points.amt_rain.push({x: x, y: originY - cHeight * (monthly[i].amt_rain - prop.amt_rain.rng_min) / (prop.amt_rain.rng_max - prop.amt_rain.rng_min)});
+            points.num_rain.push({x: x, y: originY - cHeight * (monthly[i].num_rain - prop.num_rain.rng_min) / (prop.num_rain.rng_max - prop.num_rain.rng_min)});
+            points.num_snow.push({x: x, y: originY - cHeight * (monthly[i].num_snow - prop.num_snow.rng_min) / (prop.num_snow.rng_max - prop.num_snow.rng_min)});
+            points.num_storm.push({x: x, y: originY - cHeight * (monthly[i].num_storm - prop.num_storm.rng_min) / (prop.num_storm.rng_max - prop.num_storm.rng_min)});
+            points.num_fire.push({x: x, y: originY - cHeight * (monthly[i].num_fire - prop.num_fire.rng_min) / (prop.num_fire.rng_max - prop.num_fire.rng_min)});
+            points.max_level_fire.push({x: x, y: originY - cHeight * (monthly[i].max_level_fire - prop.max_level_fire.rng_min) / (prop.max_level_fire.rng_max - prop.max_level_fire.rng_min)});
+        }
+        drawLineLabelMarkers();
+        drawPlot();
+        drawChoice();
+        drawTime();
+    }
+
+
+    function drawTime() {
+        let radius = 15;
+        if (begin.getTime() === end.getTime()) {
+            let x = originX + (bWidth + bMargin) * getIdx(begin) + bMargin + bWidth / 2;
+            drawLineWithColor(x + bWidth / 2 - 1, cMargin, x + bWidth / 2 - 1, originY, "rgb(255, 255, 255, 0.7)");
+            drawRightUpPanel.ctrl1 = drawFilledCircleWithColor(x + bWidth / 2 - 1, cMargin, radius, "rgb(255, 255, 255, 1)");
+            drawRightUpPanel.ctrl2 = undefined;
+        } else {
+            let x1 = originX + (bWidth + bMargin) * getIdx(begin) + bMargin + bWidth / 2;
+            let x2 = originX + (bWidth + bMargin) * getIdx(end) + bMargin + bWidth / 2;
+            drawRect(x1 + bWidth / 2 - 1, cMargin, x2 - x1, originY - cMargin, "rgb(255, 255, 255, 0.2)");
+
+            drawLineWithColor(x1 + bWidth / 2 - 1, cMargin, x1 + bWidth / 2 - 1, originY, "rgb(255, 255, 255, 0.7)");
+            drawRightUpPanel.ctrl1 = drawFilledCircleWithColor(x1 + bWidth / 2 - 1, cMargin, radius, "rgb(255, 255, 255, 1)");
+
+            drawLineWithColor(x2 + bWidth / 2 - 1, cMargin, x2 + bWidth / 2 - 1, originY, "rgb(255, 255, 255, 0.7)");
+            drawRightUpPanel.ctrl2 = drawFilledCircleWithColor(x2 + bWidth / 2 - 1, cMargin, radius, "rgb(255, 255, 255, 1)");
+        }
+
+        function getIdx(timestamp) {
+            for (let i = 0; i < monthly.length; i++) {
+                if (timestamp.getFullYear() <= monthly[i].year && timestamp.getMonth() <= monthly[i].month) {
+                    return i;
+                }
+            }
+            return monthly.length - 1;
+        }
+    }
+
+    function drawLineLabelMarkers() {
+        ctx.font = "24px Arial";
+        ctx.lineWidth = 2;
+        ctx.fillStyle = "#000000";
+        ctx.strokeStyle = "#000000";
+        drawLineWithColor(originX, originY, originX + cWidth, originY, "white");
+        drawLineWithColor(originX, cMargin, originX + cWidth, cMargin, "white");
+        drawXMarkers();
+    }
+
+    function drawLineWithColor(x, y, X, Y, color) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(X, Y);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    function drawFilledCircleWithColor(x, y, radius, color) {
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        let path = new Path2D();
+        path.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.fill(path);
+        return path;
+    }
+
+
+    function drawXMarkers() {
+        ctx.strokeStyle = "#E0E0E0";
+        ctx.textAlign = "center";
+        for (let i = 0; i < totalBars; i++) {
+            if (i % parseInt(totalBars / totalXNumber) === 0) {
+                let markerVal = monthly[i].year + '-' + monthly[i].month;
+                let xMarker = parseInt(originX + cWidth * (i / totalBars) + bMargin + bWidth / 2);
+                let yMarker = originY + 30;
+                ctx.fillStyle = "white";
+                ctx.font = "22px Verdana";
+                ctx.fillText(markerVal, xMarker, yMarker, cSpace);
+                if (i > 0) {
+                    drawLineWithColor(xMarker, originY, xMarker, originY - 10, "white");
+                }
+            }
+        }
+    }
+
+    function drawPlot() {
+        for (const propertyListKey of drawRightUpPanel.property_list) {
+            let color = drawRightUpPanel.properties[propertyListKey].color;
+            if (!drawRightUpPanel.properties[propertyListKey].show) color = color.replace(/[^,]+(?=\))/, " 0.1");
+            drawBezier(drawRightUpPanel.points[propertyListKey], color);
+        }
+    }
+
+    function drawChoice() {
+        ctx.fillStyle = "white";
+        ctx.font = "22px Verdana";
+
+        let idx = 0;
+        let position = [[40, 335], [150, 335], [260, 335], [370, 335], [480, 335], [40, 370], [150, 370]];
+        let translate = ['平均气温', '降雨量', '降雨天数', '降雪天数', '暴雨天数', '火灾数量', '最大火灾'];
+        for (const propertyListKey of drawRightUpPanel.property_list) {
+            let color = drawRightUpPanel.properties[propertyListKey].color;
+            if (!drawRightUpPanel.properties[propertyListKey].show) color = color.replace(/[^,]+(?=\))/, " 0.1");
+            drawRightUpPanel.properties[propertyListKey].clickObj = drawRoundedRect(position[idx][0], position[idx][1], 80, 25, 10, color, "black");
+            ctx.fillStyle = "white";
+            ctx.fillText(translate[idx], (position[idx][0] + 40) * 2, (position[idx][1] + 15) * 2);
+            ++idx;
+        }
+    }
+
+    function drawRoundedRect(left, top, width, height, radius, stroke, fill) {
+        left *= 2;
+        top *= 2;
+        width *= 2;
+        height *= 2;
+        radius *= 2;
+        let K = 4 * (Math.SQRT2 - 1) / 3; //constant for circles using Bezier curve.
+        let right = left + width;
+        let bottom = top + height;
+        let path = new Path2D();
+        ctx.beginPath();
+        // top left
+        path.moveTo(left + radius, top);
+        // top right
+        path.lineTo(right - radius, top);
+        //right top
+        path.bezierCurveTo(right + radius * (K - 1), top, right, top + radius * (1 - K), right, top + radius);
+        //right bottom
+        path.lineTo(right, bottom - radius);
+        //bottom right
+        path.bezierCurveTo(right, bottom + radius * (K - 1), right + radius * (K - 1), bottom, right - radius, bottom);
+        //bottom left
+        path.lineTo(left + radius, bottom);
+        //left bottom
+        path.bezierCurveTo(left + radius * (1 - K), bottom, left, bottom + radius * (K - 1), left, bottom - radius);
+        //left top
+        path.lineTo(left, top + radius);
+        //top left again
+        path.bezierCurveTo(left, top + radius * (1 - K), left + radius * (1 - K), top, left + radius, top);
+
+        ctx.closePath();
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = stroke;
+        ctx.fillStyle = fill;
+        ctx.stroke(path);
+        ctx.fill(path);
+        return path;
+    }
+
+    function drawBezier(point, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.font = "20px SimSun";
+        ctx.fillStyle = "#ffffff";
+        for (let i = 0; i < point.length; i++) {
+            if (i === 0) {
+                ctx.moveTo(point[i].x, point[i].y);
+            } else {
+                let ctrlP = getCtrlPoint(point, i - 1);
+                ctx.bezierCurveTo(ctrlP.pA.x, ctrlP.pA.y, ctrlP.pB.x, ctrlP.pB.y, point[i].x, point[i].y);
+                // ctx.fillText("("+point[i].x+","+point[i].y+")",point[i].x,point[i].y);
+            }
+        }
+        ctx.stroke();
+    }
+
+
+    function getCtrlPoint(ps, i) {
+        let a = 0.25;
+        let b = 0.25;
+
+        let pAx, pAy, pBx, pBy;
+
+        if (i < 1) {
+            pAx = ps[0].x + (ps[1].x - ps[0].x) * a;
+            pAy = ps[0].y + (ps[1].y - ps[0].y) * a;
+        } else {
+            pAx = ps[i].x + (ps[i + 1].x - ps[i - 1].x) * a;
+            pAy = ps[i].y + (ps[i + 1].y - ps[i - 1].y) * a;
+        }
+        if (i > ps.length - 3) {
+            let last = ps.length - 1
+            pBx = ps[last].x - (ps[last].x - ps[last - 1].x) * b;
+            pBy = ps[last].y - (ps[last].y - ps[last - 1].y) * b;
+        } else {
+            pBx = ps[i + 1].x - (ps[i + 2].x - ps[i].x) * b;
+            pBy = ps[i + 1].y - (ps[i + 2].y - ps[i].y) * b;
+        }
+
+        return {
+            pA: {x: pAx, y: pAy},
+            pB: {x: pBx, y: pBy}
+        }
+    }
+
+    //绘制方块
+    function drawRect(x, y, X, Y, color) {
+
+        ctx.beginPath();
+        ctx.rect(parseInt(x), parseInt(y), parseInt(X), parseInt(Y));
+
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.closePath();
+
+    }
+
+    addMouseMove();
+
+    function addMouseMove() {
+        canvas.addEventListener("mousemove", function (e) {
+            mousePosition.x = e.offsetX;
+            mousePosition.y = e.offsetY;
+
+            let x = e.offsetX - originX / 2;
+            let y = e.offsetY - cMargin / 2;
+            if (y > 0 && x > 0) {
+                let positionx = 1;
+                for (let i = 0; i < totalBars; i++) {
+                    if (x >= (cWidth / 2 / totalBars) * i) {
+                        positionx = i + 1;
+                    }
+                }
+                let xx = originX + ((bWidth + bMargin) * (positionx - 1) + bMargin);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawLineLabelMarkers();
+                drawPlot();
+                drawChoice();
+                drawTime();
+                if (e.offsetY * 2 < originY) {
+                    drawLineWithColor(xx + bWidth / 2 - 1, cMargin, xx + bWidth / 2 - 1, cMargin + cHeight, "white");
+
+                    let vx = xx + bWidth / 2 - 1 + 20;
+                    let vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 + 20;
+                    ctx.beginPath();
+                    ctx.moveTo(vx, vy);
+                    ctx.lineTo(vx + 200, vy);
+                    ctx.lineTo(vx + 200, vy + 330);
+                    ctx.lineTo(vx, vy + 330);
+                    ctx.lineTo(vx, vy);
+                    ctx.lineWidth = 2;
+                    ctx.fillStyle = "rgba(104,113,130,0.5)";
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = "white";
+                    ctx.textAlign = "left";
+                    ctx.font = "26px Verdana";
+                    ctx.fillText(monthly[positionx - 1].year + "-" + monthly[positionx - 1].month, vx + 20, vy + 30, 150);
+                    ctx.font = "22px Verdana";
+                    ctx.fillText("平均气温：" + monthly[positionx - 1].avg_temp, vx + 20, vy + 70, 150);
+                    ctx.fillText("降雨量：" + monthly[positionx - 1].amt_rain, vx + 20, vy + 105, 150);
+                    ctx.fillText("降雨天数：" + monthly[positionx - 1].num_rain, vx + 20, vy + 140, 150);
+                    ctx.fillText("降雪天数：" + monthly[positionx - 1].num_snow, vx + 20, vy + 175, 150);
+                    ctx.fillText("暴雨天数：" + monthly[positionx - 1].num_storm, vx + 20, vy + 210, 150);
+                    ctx.fillText("火灾数量：" + monthly[positionx - 1].num_fire, vx + 20, vy + 245, 150);
+                    ctx.fillText("最大火灾：" + monthly[positionx - 1].max_level_fire, vx + 20, vy + 280, 150);
+                }
+            } else {
+                e = e || window.event;
+                if (e.offsetX || e.offsetX === 0) {
+                    mousePosition.x = e.offsetX;
+                    mousePosition.y = e.offsetY;
+                } else if (e.layerX || e.layerX === 0) {
+                    mousePosition.x = e.layerX;
+                    mousePosition.y = e.layerY;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawLineLabelMarkers();
+                drawPlot();
+                drawChoice();
+                drawTime();
+            }
+        });
+    }
+
+    canvas.onmousedown = function (e) {
+        if (ctx.isPointInPath(drawRightUpPanel.properties.avg_temp.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.avg_temp.show = !drawRightUpPanel.properties.avg_temp.show;
+        else if (ctx.isPointInPath(drawRightUpPanel.properties.amt_rain.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.amt_rain.show = !drawRightUpPanel.properties.amt_rain.show;
+        else if (ctx.isPointInPath(drawRightUpPanel.properties.num_rain.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.num_rain.show = !drawRightUpPanel.properties.num_rain.show;
+        else if (ctx.isPointInPath(drawRightUpPanel.properties.num_snow.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.num_snow.show = !drawRightUpPanel.properties.num_snow.show;
+        else if (ctx.isPointInPath(drawRightUpPanel.properties.num_storm.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.num_storm.show = !drawRightUpPanel.properties.num_storm.show;
+        else if (ctx.isPointInPath(drawRightUpPanel.properties.num_fire.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.num_fire.show = !drawRightUpPanel.properties.num_fire.show;
+        else if (ctx.isPointInPath(drawRightUpPanel.properties.max_level_fire.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.max_level_fire.show = !drawRightUpPanel.properties.max_level_fire.show;
+
+        if (ctx.isPointInPath(drawRightUpPanel.ctrl1, e.offsetX * 2, e.offsetY * 2)) {
+            drawRightUpPanel.modifyCtrl1 = true;
+            drawRightUpPanel.modifyCtrl2 = false;
+        } else if (drawRightUpPanel.ctrl2 && ctx.isPointInPath(drawRightUpPanel.ctrl2, e.offsetX * 2, e.offsetY * 2)) {
+            drawRightUpPanel.modifyCtrl1 = false;
+            drawRightUpPanel.modifyCtrl2 = true;
+        }
+
+        document.onmousemove = function (e) {
+            let x = e.offsetX - originX / 2;
+            let positionX = 1;
+            for (let i = 0; i < totalBars; i++) {
+                if (x >= (cWidth / 2 / totalBars) * i) {
+                    positionX = i + 1;
+                }
+            }
+            if (drawRightUpPanel.modifyCtrl1) {
+                let newTime = new Date(0);
+                newTime.setFullYear(monthly[positionX - 1].year);
+                newTime.setMonth(monthly[positionX - 1].month);
+                if (newTime.getTime() > end.getTime()) {
+                    end.setFullYear(newTime.getFullYear());
+                    end.setMonth(newTime.getMonth());
+                    drawRightUpPanel.modifyCtrl1 = false;
+                    drawRightUpPanel.modifyCtrl2 = true;
+                } else {
+                    begin = newTime;
+                }
+            } else if (drawRightUpPanel.modifyCtrl2) {
+                end.setFullYear(monthly[positionX - 1].year);
+                end.setMonth(monthly[positionX - 1].month);
+                if (end.getTime() < begin.getTime()) {
+                    end.setFullYear(begin.getFullYear());
+                    end.setMonth(begin.getMonth());
+                }
+            }
+        }
+
+        document.onmouseup = function () {
+            document.onmousemove = null;
+            document.onmouseup = null;
+            drawRightUpPanel.modifyCtrl1 = false;
+            drawRightUpPanel.modifyCtrl2 = false;
+        }
     }
 }

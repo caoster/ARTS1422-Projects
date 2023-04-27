@@ -55,12 +55,22 @@
             height: 487px;
             /*border: 3px solid #73AD21;*/
         }
+
+        div.right-panel {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            width: 243px;
+            height: 487px;
+            /*border: 3px solid #73AD21;*/
+        }
     </style>
 </head>
 <body>
 <div id="wrap" class="my-map">
     <div id="mapContainer" class="amap-container"></div>
     <div id="left-panel" class="left-panel"></div>
+    <div id="right-panel" class="right-panel"></div>
 </div>
 
 <script type="text/javascript">
@@ -141,16 +151,17 @@
                 "fire": false,
                 "fire station": false,
                 "population & enterprise": false,
+                "monthly": false,
             }
         }
         initComplete.info[file] = true;
 
         if (Object.values(initComplete.info).every(value => value)) {
             console.log("All data loaded!");
-            display_fire(inTimePeriod);
-            display_fire_station(beforeEndTime);
-            display_population(inTimePeriod);
-            display_enterprise(inTimePeriod);
+            display_fire();
+            display_fire_station();
+            display_population();
+            display_enterprise();
 
             drawLeftPanel();
         }
@@ -173,10 +184,10 @@
     });
 
     /* filter is a function that returns bool */
-    function display_fire(filter) {
+    function display_fire() {
         let display_fire_list = [];
         for (const fireElement of fire) {
-            if (filter(fireElement)) {
+            if (inTimePeriod(fireElement)) {
                 display_fire_list.push(fireElement);
             }
         }
@@ -209,10 +220,10 @@
     });
 
     /* filter is a function that returns bool */
-    function display_fire_station(filter) {
+    function display_fire_station() {
         let display_fire_station_list = [];
         for (const fireStationElement of fire_station) {
-            if (filter(fireStationElement)) {
+            if (beforeEndTime(fireStationElement)) {
                 display_fire_station_list.push(fireStationElement);
             }
         }
@@ -326,6 +337,12 @@
         enterpriseLayer.render();
     }
 </script>
-
+<!-- Monthly statistics -->
+<script>
+    loadScript("/static/monthly.js", function () {
+        initComplete("monthly");
+        drawRightUpPanel();
+    })
+</script>
 </body>
 </html>
