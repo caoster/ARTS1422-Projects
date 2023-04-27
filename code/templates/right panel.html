@@ -273,7 +273,7 @@
             path.bezierCurveTo(left, top + radius * (1 - K), left + radius * (1 - K), top, left + radius, top);
 
             ctx.closePath();
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 10;
             ctx.strokeStyle = stroke;
             ctx.fillStyle = fill;
             ctx.stroke(path);
@@ -283,7 +283,7 @@
 
         function drawBezier(point, color) {
             ctx.strokeStyle = color;
-            ctx.lineWidth = 10;
+            ctx.lineWidth = 5;
             ctx.beginPath();
             ctx.font = "20px SimSun";
             ctx.fillStyle = "#ffffff";
