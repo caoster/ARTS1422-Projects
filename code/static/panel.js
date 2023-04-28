@@ -1,3 +1,37 @@
+function rounded_rect(ctx, left, top, width, height, radius, stroke, fill) {
+    let K = 4 * (Math.SQRT2 - 1) / 3; //constant for circles using Bezier curve.
+    let right = left + width;
+    let bottom = top + height;
+    let path = new Path2D();
+    drawLeftPanel.ctx.beginPath();
+    // top left
+    path.moveTo(left + radius, top);
+    // top right
+    path.lineTo(right - radius, top);
+    //right top
+    path.bezierCurveTo(right + radius * (K - 1), top, right, top + radius * (1 - K), right, top + radius);
+    //right bottom
+    path.lineTo(right, bottom - radius);
+    //bottom right
+    path.bezierCurveTo(right, bottom + radius * (K - 1), right + radius * (K - 1), bottom, right - radius, bottom);
+    //bottom left
+    path.lineTo(left + radius, bottom);
+    //left bottom
+    path.bezierCurveTo(left + radius * (1 - K), bottom, left, bottom + radius * (K - 1), left, bottom - radius);
+    //left top
+    path.lineTo(left, top + radius);
+    //top left again
+    path.bezierCurveTo(left, top + radius * (1 - K), left + radius * (1 - K), top, left + radius, top);
+
+    ctx.closePath();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = stroke;
+    ctx.fillStyle = fill;
+    ctx.stroke(path);
+    ctx.fill(path);
+    return path;
+}
+
 function drawLeftPanel() {
     if (drawLeftPanel.settings === undefined) {
         drawLeftPanel.canvas = document.createElement('canvas');
@@ -45,16 +79,16 @@ function drawLeftPanel() {
     }
 
     /* Background */
-    rounded_rect(3, 3, 237, 481, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
+    rounded_rect(drawLeftPanel.ctx, 3, 3, 237, 481, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
     if (drawLeftPanel.settings.fire)
-        drawLeftPanel.fire_button = rounded_rect(17, 16, 209, 50, 20, 'rgba(251, 61, 95, 1)', 'rgba(251, 61, 95, 0.4)');
+        drawLeftPanel.fire_button = rounded_rect(drawLeftPanel.ctx, 17, 16, 209, 50, 20, 'rgba(251, 61, 95, 1)', 'rgba(251, 61, 95, 0.4)');
     else
-        drawLeftPanel.fire_button = rounded_rect(17, 16, 209, 50, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0.4)');
-    rounded_rect(17, 96, 209, 145, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
+        drawLeftPanel.fire_button = rounded_rect(drawLeftPanel.ctx, 17, 16, 209, 50, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0.4)');
+    rounded_rect(drawLeftPanel.ctx, 17, 96, 209, 145, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
     if (drawLeftPanel.settings.fire_station)
-        drawLeftPanel.fire_station_button = rounded_rect(17, 96, 209, 50, 20, 'rgba(27, 169, 101, 1)', 'rgba(27, 169, 101, 0.4)');
+        drawLeftPanel.fire_station_button = rounded_rect(drawLeftPanel.ctx, 17, 96, 209, 50, 20, 'rgba(27, 169, 101, 1)', 'rgba(27, 169, 101, 0.4)');
     else
-        drawLeftPanel.fire_station_button = rounded_rect(17, 96, 209, 50, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0.4)');
+        drawLeftPanel.fire_station_button = rounded_rect(drawLeftPanel.ctx, 17, 96, 209, 50, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0.4)');
     drawLeftPanel.ctx.font = "bold 20px IBM Plex Sans Hebrew";
     drawLeftPanel.ctx.fillStyle = "white";
     drawLeftPanel.ctx.textAlign = "center";
@@ -64,7 +98,7 @@ function drawLeftPanel() {
     drawImage("static/texture/fire_station.png", 50, 100, 0.5);
     drawLeftPanel.ctx.fillText("消防站", 144, 128.5);
 
-    let display_area = rounded_rect(27, 156, 189, 40, 20, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
+    let display_area = rounded_rect(drawLeftPanel.ctx, 27, 156, 189, 40, 20, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
 
     if (drawLeftPanel.settings.show_area)
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
@@ -81,28 +115,28 @@ function drawLeftPanel() {
     drawLeftPanel.ctx.fill(checkmark);
 
     if (drawLeftPanel.settings.show_area && drawLeftPanel.settings.minute === 5) {
-        drawLeftPanel.scale_5_button = rounded_rect(25, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
+        drawLeftPanel.scale_5_button = rounded_rect(drawLeftPanel.ctx, 25, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     } else {
-        drawLeftPanel.scale_5_button = rounded_rect(25, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
+        drawLeftPanel.scale_5_button = rounded_rect(drawLeftPanel.ctx, 25, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     }
     drawLeftPanel.ctx.fillText("5", 44, 220);
 
     if (drawLeftPanel.settings.show_area && drawLeftPanel.settings.minute === 10) {
-        drawLeftPanel.scale_10_button = rounded_rect(71, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
+        drawLeftPanel.scale_10_button = rounded_rect(drawLeftPanel.ctx, 71, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     } else {
-        drawLeftPanel.scale_10_button = rounded_rect(71, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
+        drawLeftPanel.scale_10_button = rounded_rect(drawLeftPanel.ctx, 71, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     }
     drawLeftPanel.ctx.fillText("10", 88, 220);
 
     if (drawLeftPanel.settings.show_area && drawLeftPanel.settings.minute === 15) {
-        drawLeftPanel.scale_15_button = rounded_rect(115, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
+        drawLeftPanel.scale_15_button = rounded_rect(drawLeftPanel.ctx, 115, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     } else {
-        drawLeftPanel.scale_15_button = rounded_rect(115, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
+        drawLeftPanel.scale_15_button = rounded_rect(drawLeftPanel.ctx, 115, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     }
     drawLeftPanel.ctx.fillText("15", 132, 220);
@@ -112,12 +146,12 @@ function drawLeftPanel() {
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     drawLeftPanel.ctx.fillText("min", 182, 220);
 
-    rounded_rect(17, 274, 209, 111, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
+    rounded_rect(drawLeftPanel.ctx, 17, 274, 209, 111, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
 
     if (drawLeftPanel.settings.population)
-        drawLeftPanel.population_button = rounded_rect(17, 274, 209, 54, 20, 'rgba(227, 209, 110, 1)', 'rgba(227, 209, 110, 0.4)');
+        drawLeftPanel.population_button = rounded_rect(drawLeftPanel.ctx, 17, 274, 209, 54, 20, 'rgba(227, 209, 110, 1)', 'rgba(227, 209, 110, 0.4)');
     else
-        drawLeftPanel.population_button = rounded_rect(17, 274, 209, 54, 20, 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)');
+        drawLeftPanel.population_button = rounded_rect(drawLeftPanel.ctx, 17, 274, 209, 54, 20, 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)');
     drawImage("static/texture/people.png", 50, 280, 0.5);
     drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     drawLeftPanel.ctx.fillText("人口密度", 140, 309);
@@ -127,17 +161,17 @@ function drawLeftPanel() {
     drawLeftPanel.ctx.lineTo(226, 328);
     drawLeftPanel.ctx.stroke();
     if (drawLeftPanel.settings.enterprise)
-        drawLeftPanel.enterprise_button = rounded_rect(17, 331, 209, 54, 20, 'rgba(184, 155, 221, 1)', 'rgba(184, 155, 221, 0.4)');
+        drawLeftPanel.enterprise_button = rounded_rect(drawLeftPanel.ctx, 17, 331, 209, 54, 20, 'rgba(184, 155, 221, 1)', 'rgba(184, 155, 221, 0.4)');
     else
-        drawLeftPanel.enterprise_button = rounded_rect(17, 331, 209, 54, 20, 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)');
+        drawLeftPanel.enterprise_button = rounded_rect(drawLeftPanel.ctx, 17, 331, 209, 54, 20, 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)');
     drawImage("static/texture/enterprise.png", 50, 337, 0.5);
     drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     drawLeftPanel.ctx.fillText("企业密度", 140, 365);
 
     if (drawLeftPanel.settings.select)
-        drawLeftPanel.select_button = rounded_rect(17, 410, 209, 50, 20, 'rgb(31, 88, 180)', 'rgba(31, 88, 180, 0.4)');
+        drawLeftPanel.select_button = rounded_rect(drawLeftPanel.ctx, 17, 410, 209, 50, 20, 'rgb(31, 88, 180)', 'rgba(31, 88, 180, 0.4)');
     else
-        drawLeftPanel.select_button = rounded_rect(17, 410, 209, 50, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0.4)');
+        drawLeftPanel.select_button = rounded_rect(drawLeftPanel.ctx, 17, 410, 209, 50, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0.4)');
     drawImage("static/texture/select.png", 65, 420, 0.5);
     drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     drawLeftPanel.ctx.fillText("框选", 134, 443);
@@ -149,43 +183,24 @@ function drawLeftPanel() {
             drawLeftPanel.ctx.drawImage(drawing, x, y, drawing.width * scale, drawing.height * scale);
         };
     }
-
-    function rounded_rect(left, top, width, height, radius, stroke, fill) {
-        let K = 4 * (Math.SQRT2 - 1) / 3; //constant for circles using Bezier curve.
-        let right = left + width;
-        let bottom = top + height;
-        let path = new Path2D();
-        drawLeftPanel.ctx.beginPath();
-        // top left
-        path.moveTo(left + radius, top);
-        // top right
-        path.lineTo(right - radius, top);
-        //right top
-        path.bezierCurveTo(right + radius * (K - 1), top, right, top + radius * (1 - K), right, top + radius);
-        //right bottom
-        path.lineTo(right, bottom - radius);
-        //bottom right
-        path.bezierCurveTo(right, bottom + radius * (K - 1), right + radius * (K - 1), bottom, right - radius, bottom);
-        //bottom left
-        path.lineTo(left + radius, bottom);
-        //left bottom
-        path.bezierCurveTo(left + radius * (1 - K), bottom, left, bottom + radius * (K - 1), left, bottom - radius);
-        //left top
-        path.lineTo(left, top + radius);
-        //top left again
-        path.bezierCurveTo(left, top + radius * (1 - K), left + radius * (1 - K), top, left + radius, top);
-
-        drawLeftPanel.ctx.closePath();
-        drawLeftPanel.ctx.lineWidth = 3;
-        drawLeftPanel.ctx.strokeStyle = stroke;
-        drawLeftPanel.ctx.fillStyle = fill;
-        drawLeftPanel.ctx.stroke(path);
-        drawLeftPanel.ctx.fill(path);
-        return path;
-    }
 }
 
 function drawRightPanel() {
+    drawRightPanel.canvas = document.querySelector("#right-panel");
+    drawRightPanel.canvas.width = 600;
+    drawRightPanel.canvas.height = 300 * 3;
+    drawRightPanel.ctx = drawRightPanel.canvas.getContext("2d");
+
+    rounded_rect(drawRightPanel.ctx, 10, 10, 600 - 20, 300 * 3 - 20, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
+    drawRightPanel.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    drawRightPanel.ctx.lineWidth = 2;
+    drawRightPanel.ctx.moveTo(15, 300 + 20);
+    drawRightPanel.ctx.lineTo(600 - 15, 300 + 20);
+    drawRightPanel.ctx.stroke();
+    drawRightPanel.ctx.moveTo(15, 600 + 20);
+    drawRightPanel.ctx.lineTo(600 - 15, 600 + 20);
+    drawRightPanel.ctx.stroke();
+
     drawRightUpPanel();
     drawRightMidPanel();
 }
@@ -196,7 +211,6 @@ function drawRightUpPanel() {
     drawRightUpPanel.canvas = document.createElement("canvas");
     drawRightUpPanel.canvas.width = 600 * 2;
     drawRightUpPanel.canvas.height = 300 * 2;
-    drawRightUpPanel.canvas.style.margin = "30px";
     let ctx = drawRightUpPanel.canvas.getContext("2d");
 
     let cBox = document.getElementById("right-up-panel");
@@ -381,10 +395,10 @@ function drawRightUpPanel() {
 
     function drawChoice() {
         ctx.fillStyle = "white";
-        ctx.font = "22px Verdana";
+        ctx.font = "26px Verdana";
 
         let idx = 0;
-        let position = [[40, 235], [150, 235], [260, 235], [370, 235], [480, 235], [40, 270], [150, 270]];
+        let position = [[40, 238], [150, 238], [260, 238], [370, 238], [480, 238], [40, 268], [150, 268]];
         let translate = ['平均气温', '降雨量', '降雨天数', '降雪天数', '暴雨天数', '火灾数量', '最大火灾'];
         for (const propertyListKey of drawRightUpPanel.property_list) {
             let color = drawRightUpPanel.properties[propertyListKey].color;
@@ -627,7 +641,6 @@ function drawRightMidPanel(visit) {
     drawRightMidPanel.canvas = document.createElement("canvas");
     drawRightMidPanel.canvas.width = 600;
     drawRightMidPanel.canvas.height = 300;
-    drawRightMidPanel.canvas.style.margin = "30px";
     drawRightMidPanel.ctx = drawRightMidPanel.canvas.getContext("2d");
     let cBox = document.getElementById("right-mid-panel");
     cBox.appendChild(drawRightMidPanel.canvas);

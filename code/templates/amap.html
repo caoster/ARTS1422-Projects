@@ -53,13 +53,26 @@
             left: 5%;
             width: 243px;
             height: 487px;
+            z-index: 400;
             /*border: 3px solid #73AD21;*/
         }
 
-        div.right-panel {
+        div.wrapper {
             position: absolute;
             top: 5%;
             left: 60%;
+            width: 600px;
+            height: 900px;
+        }
+
+        #right-panel, #right-panel-body {
+            position: absolute;
+            width: 600px;
+            height: 900px;
+        }
+
+        #right-panel-body {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -67,10 +80,13 @@
 <div id="wrap" class="my-map">
     <div id="mapContainer" class="amap-container"></div>
     <div id="left-panel" class="left-panel"></div>
-    <div id="right-panel" class="right-panel">
-        <div id="right-up-panel"></div>
-        <div id="right-mid-panel"></div>
-        <div id="right-bot-panel"></div>
+    <div class='wrapper'>
+        <canvas id="right-panel"></canvas>
+        <div id="right-panel-body">
+            <div id="right-up-panel"></div>
+            <div id="right-mid-panel"></div>
+            <div id="right-bot-panel"></div>
+        </div>
     </div>
 </div>
 
