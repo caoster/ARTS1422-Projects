@@ -616,6 +616,7 @@ function drawRightUpPanel() {
             drawRightUpPanel.modifyCtrl1 = false;
             drawRightUpPanel.modifyCtrl2 = false;
             drawRightMidPanel("redraw");
+            redrawMap();
         }
     }
 }

@@ -124,6 +124,13 @@
 </script>
 <!-- Helper functions -->
 <script>
+    function redrawMap() {
+        display_fire();
+        display_fire_station();
+        display_population();
+        display_enterprise();
+    }
+
     function loadScript(src, callback) {
         let script = document.createElement('script');
         script.setAttribute('src', src);
@@ -159,10 +166,7 @@
 
         if (Object.values(initComplete.info).every(value => value)) {
             console.log("All data loaded!");
-            display_fire();
-            display_fire_station();
-            display_population();
-            display_enterprise();
+            redrawMap();
 
             drawLeftPanel();
             drawRightPanel();
