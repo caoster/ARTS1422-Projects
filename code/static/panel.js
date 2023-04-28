@@ -615,61 +615,66 @@ function drawRightUpPanel() {
             document.onmouseup = null;
             drawRightUpPanel.modifyCtrl1 = false;
             drawRightUpPanel.modifyCtrl2 = false;
+            drawRightMidPanel("redraw");
         }
     }
 }
 
-function drawRightMidPanel() {
+function drawRightMidPanel(visit) {
+    if (visit === "redraw") return redraw();
 
     drawRightMidPanel.canvas = document.createElement("canvas");
     drawRightMidPanel.canvas.width = 600;
     drawRightMidPanel.canvas.height = 300;
     drawRightMidPanel.canvas.style.margin = "30px";
-    let ctx = drawRightMidPanel.canvas.getContext("2d");
+    drawRightMidPanel.ctx = drawRightMidPanel.canvas.getContext("2d");
     let cBox = document.getElementById("right-mid-panel");
     cBox.appendChild(drawRightMidPanel.canvas);
-
-
-    let count_reason = {}
-    for (const fireElement of fire) {
-        if (inTimePeriod(fireElement)) {
-            if (fireElement.type in count_reason) count_reason[fireElement.type] += 1;
-            else count_reason[fireElement.type] = 1;
-        }
-    }
-
-    // Descending order
-    count_reason = Object.entries(count_reason).sort((a, b) => (b[1] - a[1]));
-    console.log(count_reason)
 
     function getColor(idx) {
         let scheme = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928']
         return scheme[Math.min(idx, scheme.length)];
     }
 
-    let position = [[40, 210], [150, 210], [40, 240], [150, 240], [40, 270], [150, 270]]
-    let currentAngle = 0;
-    let sum = count_reason.map(v => v[1])
-        .reduce((a, b) => (a + b));
-    let idx = 0;
-    ctx.font = "18px Verdana";
-    for (let reason of count_reason) {
-        let portionAngle = (reason[1] / sum) * 2 * Math.PI;
-        ctx.beginPath();
-        ctx.arc(150, 100, 100, currentAngle, currentAngle + portionAngle);
-        currentAngle += portionAngle;
-        ctx.lineTo(150, 100);
-        ctx.fillStyle = getColor(idx);
-        ctx.fill();
+    redraw();
 
-        if (idx < position.length) {
-            let pos = position[idx];
-            ctx.rect(pos[0], pos[1], 20, 20);
-            ctx.fill();
-            ctx.fillText(reason[0], pos[0] + 25, pos[1] + 17);
+    function redraw() {
+        drawRightMidPanel.ctx.clearRect(0, 0, drawRightMidPanel.canvas.width, drawRightMidPanel.canvas.height);
+
+        let count_reason = {}
+        for (const fireElement of fire) {
+            if (inTimePeriod(fireElement)) {
+                if (fireElement.type in count_reason) count_reason[fireElement.type] += 1;
+                else count_reason[fireElement.type] = 1;
+            }
         }
 
-        ++idx;
-    }
+        // Descending order
+        count_reason = Object.entries(count_reason).sort((a, b) => (b[1] - a[1]));
 
+        let position = [[40, 210], [150, 210], [40, 240], [150, 240], [40, 270], [150, 270]]
+        let currentAngle = 0;
+        let sum = count_reason.map(v => v[1])
+            .reduce((a, b) => (a + b));
+        let idx = 0;
+        drawRightMidPanel.ctx.font = "18px Verdana";
+        for (let reason of count_reason) {
+            let portionAngle = (reason[1] / sum) * 2 * Math.PI;
+            drawRightMidPanel.ctx.beginPath();
+            drawRightMidPanel.ctx.arc(150, 100, 100, currentAngle, currentAngle + portionAngle);
+            currentAngle += portionAngle;
+            drawRightMidPanel.ctx.lineTo(150, 100);
+            drawRightMidPanel.ctx.fillStyle = getColor(idx);
+            drawRightMidPanel.ctx.fill();
+
+            if (idx < position.length) {
+                let pos = position[idx];
+                drawRightMidPanel.ctx.rect(pos[0], pos[1], 20, 20);
+                drawRightMidPanel.ctx.fill();
+                drawRightMidPanel.ctx.fillText(reason[0], pos[0] + 25, pos[1] + 17);
+            }
+
+            ++idx;
+        }
+    }
 }
