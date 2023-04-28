@@ -185,26 +185,30 @@ function drawLeftPanel() {
     }
 }
 
+function drawRightPanel() {
+    drawRightUpPanel();
+    drawRightMidPanel();
+}
+
 function drawRightUpPanel() {
     let mousePosition = {};
 
-    let canvas = document.createElement("canvas");
-    canvas.width = 600 * 2;
-    canvas.height = 400 * 2;
-    canvas.style.margin = "30px";
-    canvas.id = "right-panel-bg";
-    let ctx = canvas.getContext("2d");
+    drawRightUpPanel.canvas = document.createElement("canvas");
+    drawRightUpPanel.canvas.width = 600 * 2;
+    drawRightUpPanel.canvas.height = 300 * 2;
+    drawRightUpPanel.canvas.style.margin = "30px";
+    let ctx = drawRightUpPanel.canvas.getContext("2d");
 
-    let cBox = document.getElementById("right-panel");
-    cBox.appendChild(canvas);
+    let cBox = document.getElementById("right-up-panel");
+    cBox.appendChild(drawRightUpPanel.canvas);
 
     let cMargin = 20;
     let cSpace = 80;
 
-    canvas.style.height = canvas.height / 2 + "px";
-    canvas.style.width = canvas.width / 2 + "px";
-    let cHeight = canvas.height - cMargin * 2 - cSpace * 2;
-    let cWidth = canvas.width - cMargin * 2 - cSpace * 2;
+    drawRightUpPanel.canvas.style.height = drawRightUpPanel.canvas.height / 2 + "px";
+    drawRightUpPanel.canvas.style.width = drawRightUpPanel.canvas.width / 2 + "px";
+    let cHeight = drawRightUpPanel.canvas.height - cMargin * 2 - cSpace * 2;
+    let cWidth = drawRightUpPanel.canvas.width - cMargin * 2 - cSpace * 2;
     let originX = cMargin + cSpace;
     let originY = cMargin + cHeight;
 
@@ -286,10 +290,7 @@ function drawRightUpPanel() {
             points.num_fire.push({x: x, y: originY - cHeight * (monthly[i].num_fire - prop.num_fire.rng_min) / (prop.num_fire.rng_max - prop.num_fire.rng_min)});
             points.max_level_fire.push({x: x, y: originY - cHeight * (monthly[i].max_level_fire - prop.max_level_fire.rng_min) / (prop.max_level_fire.rng_max - prop.max_level_fire.rng_min)});
         }
-        drawLineLabelMarkers();
-        drawPlot();
-        drawChoice();
-        drawTime();
+        drawBody();
     }
 
 
@@ -383,7 +384,7 @@ function drawRightUpPanel() {
         ctx.font = "22px Verdana";
 
         let idx = 0;
-        let position = [[40, 335], [150, 335], [260, 335], [370, 335], [480, 335], [40, 370], [150, 370]];
+        let position = [[40, 235], [150, 235], [260, 235], [370, 235], [480, 235], [40, 270], [150, 270]];
         let translate = ['平均气温', '降雨量', '降雨天数', '降雪天数', '暴雨天数', '火灾数量', '最大火灾'];
         for (const propertyListKey of drawRightUpPanel.property_list) {
             let color = drawRightUpPanel.properties[propertyListKey].color;
@@ -452,7 +453,6 @@ function drawRightUpPanel() {
         ctx.stroke();
     }
 
-
     function getCtrlPoint(ps, i) {
         let a = 0.25;
         let b = 0.25;
@@ -481,7 +481,6 @@ function drawRightUpPanel() {
         }
     }
 
-    //绘制方块
     function drawRect(x, y, X, Y, color) {
 
         ctx.beginPath();
@@ -495,8 +494,16 @@ function drawRightUpPanel() {
 
     addMouseMove();
 
+    function drawBody() {
+        ctx.clearRect(0, 0, drawRightUpPanel.canvas.width, drawRightUpPanel.canvas.height);
+        drawLineLabelMarkers();
+        drawPlot();
+        drawChoice();
+        drawTime();
+    }
+
     function addMouseMove() {
-        canvas.addEventListener("mousemove", function (e) {
+        drawRightUpPanel.canvas.addEventListener("mousemove", function (e) {
             mousePosition.x = e.offsetX;
             mousePosition.y = e.offsetY;
 
@@ -511,16 +518,12 @@ function drawRightUpPanel() {
                 }
                 let xx = originX + ((bWidth + bMargin) * (positionx - 1) + bMargin);
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawLineLabelMarkers();
-                drawPlot();
-                drawChoice();
-                drawTime();
+                drawBody();
                 if (e.offsetY * 2 < originY) {
                     drawLineWithColor(xx + bWidth / 2 - 1, cMargin, xx + bWidth / 2 - 1, cMargin + cHeight, "white");
 
-                    let vx = xx + bWidth / 2 - 1 + 20;
-                    let vy = canvas.getBoundingClientRect().top + event.pageY * 2 - 90 + 20;
+                    let vx = e.offsetX + cWidth / 5;
+                    let vy = e.offsetY;
                     ctx.beginPath();
                     ctx.moveTo(vx, vy);
                     ctx.lineTo(vx + 200, vy);
@@ -555,16 +558,12 @@ function drawRightUpPanel() {
                     mousePosition.y = e.layerY;
                 }
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawLineLabelMarkers();
-                drawPlot();
-                drawChoice();
-                drawTime();
+                drawBody();
             }
         });
     }
 
-    canvas.onmousedown = function (e) {
+    drawRightUpPanel.canvas.onmousedown = function (e) {
         if (ctx.isPointInPath(drawRightUpPanel.properties.avg_temp.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.avg_temp.show = !drawRightUpPanel.properties.avg_temp.show;
         else if (ctx.isPointInPath(drawRightUpPanel.properties.amt_rain.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.amt_rain.show = !drawRightUpPanel.properties.amt_rain.show;
         else if (ctx.isPointInPath(drawRightUpPanel.properties.num_rain.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.num_rain.show = !drawRightUpPanel.properties.num_rain.show;
@@ -618,4 +617,59 @@ function drawRightUpPanel() {
             drawRightUpPanel.modifyCtrl2 = false;
         }
     }
+}
+
+function drawRightMidPanel() {
+
+    drawRightMidPanel.canvas = document.createElement("canvas");
+    drawRightMidPanel.canvas.width = 600;
+    drawRightMidPanel.canvas.height = 300;
+    drawRightMidPanel.canvas.style.margin = "30px";
+    let ctx = drawRightMidPanel.canvas.getContext("2d");
+    let cBox = document.getElementById("right-mid-panel");
+    cBox.appendChild(drawRightMidPanel.canvas);
+
+
+    let count_reason = {}
+    for (const fireElement of fire) {
+        if (inTimePeriod(fireElement)) {
+            if (fireElement.type in count_reason) count_reason[fireElement.type] += 1;
+            else count_reason[fireElement.type] = 1;
+        }
+    }
+
+    // Descending order
+    count_reason = Object.entries(count_reason).sort((a, b) => (b[1] - a[1]));
+    console.log(count_reason)
+
+    function getColor(idx) {
+        let scheme = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928']
+        return scheme[Math.min(idx, scheme.length)];
+    }
+
+    let position = [[40, 210], [150, 210], [40, 240], [150, 240], [40, 270], [150, 270]]
+    let currentAngle = 0;
+    let sum = count_reason.map(v => v[1])
+        .reduce((a, b) => (a + b));
+    let idx = 0;
+    ctx.font = "18px Verdana";
+    for (let reason of count_reason) {
+        let portionAngle = (reason[1] / sum) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.arc(150, 100, 100, currentAngle, currentAngle + portionAngle);
+        currentAngle += portionAngle;
+        ctx.lineTo(150, 100);
+        ctx.fillStyle = getColor(idx);
+        ctx.fill();
+
+        if (idx < position.length) {
+            let pos = position[idx];
+            ctx.rect(pos[0], pos[1], 20, 20);
+            ctx.fill();
+            ctx.fillText(reason[0], pos[0] + 25, pos[1] + 17);
+        }
+
+        ++idx;
+    }
+
 }
