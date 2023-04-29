@@ -631,6 +631,7 @@ function drawRightUpPanel() {
             drawRightUpPanel.modifyCtrl1 = false;
             drawRightUpPanel.modifyCtrl2 = false;
             drawRightMidLeftPanel("redraw");
+            drawRightMidRightPanel();
             redrawMap();
         }
     }
@@ -695,26 +696,27 @@ function drawRightMidLeftPanel(visit) {
 }
 
 function drawRightMidRightPanel() {
-    let data = [{
+    let data = fire.filter(inTimePeriod);
+    let points = [{
         type: 'parcoords',
         line: {
-            color: fire.map(row => row['level']),
+            color: data.map(row => row['level']),
             colorscale: "Bluered"
         },
 
         dimensions: [{
             // range: [1, 5],
             label: '\u706b\u60c5', // 火情
-            values: fire.map(row => row['level'])
+            values: data.map(row => row['level'])
         }, {
             label: '\u6c14\u6e29', // 气温
-            values: fire.map(row => row['temp'])
+            values: data.map(row => row['temp'])
         }, {
             label: '\u4eba\u53e3', // 人口
-            values: fire.map(row => row['popu'])
+            values: data.map(row => row['popu'])
         }, {
             label: '\u4f01\u4e1a', // 企业
-            values: fire.map(row => row['indu'])
+            values: data.map(row => row['indu'])
         }]
     }];
 
@@ -735,5 +737,5 @@ function drawRightMidRightPanel() {
         },
     };
 
-    Plotly.newPlot('right-mid-right-panel', data, layout, {displayModeBar: false});
+    Plotly.newPlot('right-mid-right-panel', points, layout, {displayModeBar: false});
 }
