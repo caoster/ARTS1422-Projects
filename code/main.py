@@ -36,13 +36,14 @@ for idx, event in fire.iterrows():
                                     "type": event[2],
                                     "fighters": [event[3]],
                                     "lnglat": [event[6], event[5]],
-                                    "level": random.randint(1,5)
+                                    "level": 1
                                     }
     else:
         if event[4] == "增援":
             fire_json_data[event[0]]["fighters"].append(event[3])
         else:
             fire_json_data[event[0]]["fighters"].insert(0, event[3])
+        fire_json_data[event[0]]["level"] += 1
     if event[4] == "主战":
         fire_json_data[event[0]]["key_fighter"] = event[3]
 for i in fire_json_data:

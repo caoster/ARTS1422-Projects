@@ -191,7 +191,7 @@ function drawRightPanel() {
     drawRightPanel.canvas.height = 300 * 3;
     drawRightPanel.ctx = drawRightPanel.canvas.getContext("2d");
 
-    rounded_rect(drawRightPanel.ctx, 10, 10, 600 - 20, 300 * 3 - 20, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
+    rounded_rect(drawRightPanel.ctx, 5, 5, 600 - 10, 300 * 3 - 10, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
     drawRightPanel.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
     drawRightPanel.ctx.lineWidth = 2;
     drawRightPanel.ctx.moveTo(15, 300 + 20);
@@ -202,7 +202,8 @@ function drawRightPanel() {
     drawRightPanel.ctx.stroke();
 
     drawRightUpPanel();
-    drawRightMidPanel();
+    drawRightMidLeftPanel();
+    drawRightMidRightPanel();
 }
 
 function drawRightUpPanel() {
@@ -629,21 +630,21 @@ function drawRightUpPanel() {
             document.onmouseup = null;
             drawRightUpPanel.modifyCtrl1 = false;
             drawRightUpPanel.modifyCtrl2 = false;
-            drawRightMidPanel("redraw");
+            drawRightMidLeftPanel("redraw");
             redrawMap();
         }
     }
 }
 
-function drawRightMidPanel(visit) {
+function drawRightMidLeftPanel(visit) {
     if (visit === "redraw") return redraw();
 
-    drawRightMidPanel.canvas = document.createElement("canvas");
-    drawRightMidPanel.canvas.width = 600;
-    drawRightMidPanel.canvas.height = 300;
-    drawRightMidPanel.ctx = drawRightMidPanel.canvas.getContext("2d");
-    let cBox = document.getElementById("right-mid-panel");
-    cBox.appendChild(drawRightMidPanel.canvas);
+    drawRightMidLeftPanel.canvas = document.createElement("canvas");
+    drawRightMidLeftPanel.canvas.width = 300;
+    drawRightMidLeftPanel.canvas.height = 300;
+    drawRightMidLeftPanel.ctx = drawRightMidLeftPanel.canvas.getContext("2d");
+    let cBox = document.getElementById("right-mid-left-panel");
+    cBox.appendChild(drawRightMidLeftPanel.canvas);
 
     function getColor(idx) {
         let scheme = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928']
@@ -653,7 +654,7 @@ function drawRightMidPanel(visit) {
     redraw();
 
     function redraw() {
-        drawRightMidPanel.ctx.clearRect(0, 0, drawRightMidPanel.canvas.width, drawRightMidPanel.canvas.height);
+        drawRightMidLeftPanel.ctx.clearRect(0, 0, drawRightMidLeftPanel.canvas.width, drawRightMidLeftPanel.canvas.height);
 
         let count_reason = {}
         for (const fireElement of fire) {
@@ -666,29 +667,73 @@ function drawRightMidPanel(visit) {
         // Descending order
         count_reason = Object.entries(count_reason).sort((a, b) => (b[1] - a[1]));
 
-        let position = [[40, 210], [150, 210], [40, 240], [150, 240], [40, 270], [150, 270]]
+        let position = [[15, 210], [125, 210], [15, 240], [125, 240], [15, 270], [125, 270]]
         let currentAngle = 0;
         let sum = count_reason.map(v => v[1])
             .reduce((a, b) => (a + b));
         let idx = 0;
-        drawRightMidPanel.ctx.font = "18px Verdana";
+        drawRightMidLeftPanel.ctx.font = "18px Verdana";
         for (let reason of count_reason) {
             let portionAngle = (reason[1] / sum) * 2 * Math.PI;
-            drawRightMidPanel.ctx.beginPath();
-            drawRightMidPanel.ctx.arc(150, 100, 100, currentAngle, currentAngle + portionAngle);
+            drawRightMidLeftPanel.ctx.beginPath();
+            drawRightMidLeftPanel.ctx.arc(125, 100, 100, currentAngle, currentAngle + portionAngle);
             currentAngle += portionAngle;
-            drawRightMidPanel.ctx.lineTo(150, 100);
-            drawRightMidPanel.ctx.fillStyle = getColor(idx);
-            drawRightMidPanel.ctx.fill();
+            drawRightMidLeftPanel.ctx.lineTo(125, 100);
+            drawRightMidLeftPanel.ctx.fillStyle = getColor(idx);
+            drawRightMidLeftPanel.ctx.fill();
 
             if (idx < position.length) {
                 let pos = position[idx];
-                drawRightMidPanel.ctx.rect(pos[0], pos[1], 20, 20);
-                drawRightMidPanel.ctx.fill();
-                drawRightMidPanel.ctx.fillText(reason[0], pos[0] + 25, pos[1] + 17);
+                drawRightMidLeftPanel.ctx.rect(pos[0], pos[1], 20, 20);
+                drawRightMidLeftPanel.ctx.fill();
+                drawRightMidLeftPanel.ctx.fillText(reason[0], pos[0] + 25, pos[1] + 17);
             }
 
             ++idx;
         }
     }
+}
+
+function drawRightMidRightPanel() {
+    let data = [{
+        type: 'parcoords',
+        line: {
+            color: fire.map(row => row['level']),
+            colorscale: "Bluered"
+        },
+
+        dimensions: [{
+            // range: [1, 5],
+            label: '\u706b\u60c5', // 火情
+            values: fire.map(row => row['level'])
+        }, {
+            label: '\u6c14\u6e29', // 气温
+            values: fire.map(row => row['temp'])
+        }, {
+            label: '\u4eba\u53e3', // 人口
+            values: fire.map(row => row['popu'])
+        }, {
+            label: '\u4f01\u4e1a', // 企业
+            values: fire.map(row => row['indu'])
+        }]
+    }];
+
+    let layout = {
+        height: 300,
+        plot_bgcolor: "rgba(0, 0, 0, 0)",
+        paper_bgcolor: "rgba(0, 0, 0, 0)",
+        margin: {
+            l: 30,
+            r: 45,
+            b: 35,
+            t: 50,
+        },
+        font: {
+            family: 'Verdana',
+            size: 18,
+            color: 'rgba(255, 255, 255, 1)'
+        },
+    };
+
+    Plotly.newPlot('right-mid-right-panel', data, layout, {displayModeBar: false});
 }

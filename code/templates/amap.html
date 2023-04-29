@@ -84,7 +84,10 @@
         <canvas id="right-panel"></canvas>
         <div id="right-panel-body">
             <div id="right-up-panel"></div>
-            <div id="right-mid-panel"></div>
+            <div style="width: 100%">
+                <div id="right-mid-left-panel" style="width: 38%; float: left"></div>
+                <div id="right-mid-right-panel" style="width: 62%; float: left"></div>
+            </div>
             <div id="right-bot-panel"></div>
         </div>
     </div>
@@ -101,6 +104,7 @@
 <script src="//webapi.amap.com/maps?v=1.4.15&key=736114382e4cd8877312b9345a0f3c9e"></script>
 <script src="//webapi.amap.com/loca?v=1.3.2&key=736114382e4cd8877312b9345a0f3c9e"></script>
 <script src="//a.amap.com/Loca/static/dist/jquery.min.js"></script>
+<script src="//cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
 <script>
     let infoWindow, map, level = 12,
         center = {lng: 120.14325, lat: 30.281472}; // amap location

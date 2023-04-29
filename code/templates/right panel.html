@@ -22,25 +22,25 @@
 
         let data = [{
             type: 'parcoords',
-            pad: [80, 80, 80, 80],
+            // pad: [80, 80, 80, 80],
             line: {
-                color: unpack(fire, 'level'),
+                color: fire.map(row => row['level']),
                 colorscale: "Bluered"
             },
 
             dimensions: [{
-                range: [1, 5],
+                // range: [1, 5],
                 label: '\u706b\u60c5', // 火情
-                values: unpack(fire, 'level')
+                values: fire.map(row => row['level'])
             }, {
                 label: '\u6c14\u6e29', // 气温
-                values: unpack(fire, 'temp')
+                values: fire.map(row => row['temp'])
             }, {
                 label: '\u4eba\u53e3', // 人口
-                values: unpack(fire, 'popu')
+                values: fire.map(row => row['popu'])
             }, {
                 label: '\u4f01\u4e1a', // 企业
-                values: unpack(fire, 'indu')
+                values: fire.map(row => row['indu'])
             }]
         }];
 
@@ -50,11 +50,5 @@
 
         Plotly.newPlot('myDiv', data, layout);
     })
-
-    function unpack(rows, key) {
-        return rows.map(function (row) {
-            return row[key];
-        });
-    }
 
 </script>
