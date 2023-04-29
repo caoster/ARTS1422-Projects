@@ -188,10 +188,10 @@ function drawLeftPanel() {
 function drawRightPanel() {
     drawRightPanel.canvas = document.querySelector("#right-panel");
     drawRightPanel.canvas.width = 600;
-    drawRightPanel.canvas.height = 300 * 3;
+    drawRightPanel.canvas.height = 920;
     drawRightPanel.ctx = drawRightPanel.canvas.getContext("2d");
 
-    rounded_rect(drawRightPanel.ctx, 5, 5, 600 - 10, 300 * 3 - 10, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
+    rounded_rect(drawRightPanel.ctx, 5, 5, 600 - 10, 920 - 10, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
     drawRightPanel.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
     drawRightPanel.ctx.lineWidth = 2;
     drawRightPanel.ctx.moveTo(15, 300 + 20);
@@ -204,6 +204,7 @@ function drawRightPanel() {
     drawRightUpPanel();
     drawRightMidLeftPanel();
     drawRightMidRightPanel();
+    drawRightBotPanel();
 }
 
 function drawRightUpPanel() {
@@ -578,6 +579,10 @@ function drawRightUpPanel() {
         });
     }
 
+    function getDaysInMonth(m, y) {
+        return m === 2 ? y & 3 || !(y % 25) && y & 15 ? 28 : 29 : 30 + (m + (m >> 3) & 1);
+    }
+
     drawRightUpPanel.canvas.onmousedown = function (e) {
         if (ctx.isPointInPath(drawRightUpPanel.properties.avg_temp.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.avg_temp.show = !drawRightUpPanel.properties.avg_temp.show;
         else if (ctx.isPointInPath(drawRightUpPanel.properties.amt_rain.clickObj, e.offsetX * 2, e.offsetY * 2)) drawRightUpPanel.properties.amt_rain.show = !drawRightUpPanel.properties.amt_rain.show;
@@ -610,6 +615,10 @@ function drawRightUpPanel() {
                 if (newTime.getTime() > end.getTime()) {
                     end.setFullYear(newTime.getFullYear());
                     end.setMonth(newTime.getMonth());
+                    end.setDate(getDaysInMonth(end.getMonth(), end.getFullYear()));
+                    end.setHours(23);
+                    end.setMinutes(59);
+                    end.setSeconds(59);
                     drawRightUpPanel.modifyCtrl1 = false;
                     drawRightUpPanel.modifyCtrl2 = true;
                 } else {
@@ -632,6 +641,7 @@ function drawRightUpPanel() {
             drawRightUpPanel.modifyCtrl2 = false;
             drawRightMidLeftPanel("redraw");
             drawRightMidRightPanel();
+            drawRightBotPanel();
             redrawMap();
         }
     }
@@ -738,4 +748,81 @@ function drawRightMidRightPanel() {
     };
 
     Plotly.newPlot('right-mid-right-panel', points, layout, {displayModeBar: false});
+}
+
+function drawRightBotPanel() {
+    let data = fire.filter(inTimePeriod);
+    let filtered_station = fire_station.filter(beforeEndTime);
+    for (const filteredStationElement of filtered_station) {
+        filteredStationElement["count"] = 0;
+        filteredStationElement["popu"] = 0;
+        filteredStationElement["indu"] = 0;
+    }
+
+    for (const datum of data) {
+        for (const fighter of datum["fighters"]) {
+            for (const filteredStationElement of filtered_station) {
+                if (filteredStationElement["station_code"] === fighter) {
+                    filteredStationElement["count"] += 1;
+                    filteredStationElement["popu"] = Math.max(datum["popu"], filteredStationElement["popu"]);
+                    filteredStationElement["indu"] = Math.max(datum["indu"], filteredStationElement["indu"]);
+                    break;
+                }
+            }
+        }
+    }
+
+    function linspace(start, stop) {
+        const step = (stop - start) / 4;
+        return Array.from({length: 5}, (_, i) => start + step * i);
+    }
+
+    let ticks = linspace(Math.min(...filtered_station.map(row => (row['time'].getTime()))), Math.max(...filtered_station.map(row => (row['time'].getTime()))));
+
+    let points = [{
+        type: 'parcoords',
+        line: {
+            color: data.map(row => row['level']),
+            colorscale: "Bluered"
+        },
+
+        dimensions: [{
+            label: '\u6295\u7528\u5e74\u6708', // 投用年月
+            values: filtered_station.map(row => (row['time'].getTime())),
+            ticktext: ticks.map((t) => {
+                let time = new Date(t);
+                return time.getFullYear() + "-" + Math.max(1, time.getMonth());
+            }),
+            tickvals: ticks.map((t) => new Date(t)),
+        }, {
+            label: '\u6570\u91cf', // 数量
+            values: filtered_station.map(row => row['count'])
+        }, {
+            label: '\u4eba\u53e3', // 人口
+            values: filtered_station.map(row => row['popu'])
+        }, {
+            label: '\u4f01\u4e1a', // 企业
+            values: filtered_station.map(row => row['indu'])
+        }]
+    }];
+
+    let layout = {
+        width: 600,
+        height: 300,
+        plot_bgcolor: "rgba(0, 0, 0, 0)",
+        paper_bgcolor: "rgba(0, 0, 0, 0)",
+        margin: {
+            l: 80,
+            r: 50,
+            b: 50,
+            t: 50,
+        },
+        font: {
+            family: 'Verdana',
+            size: 18,
+            color: 'rgba(255, 255, 255, 1)'
+        },
+    };
+
+    Plotly.newPlot('right-bot-panel', points, layout, {displayModeBar: false});
 }
