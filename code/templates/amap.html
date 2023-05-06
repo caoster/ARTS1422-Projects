@@ -15,7 +15,7 @@
         .my-map {
             margin: 0 auto;
             width: 100%;
-            height: 90vh;
+            height: 100vh;
         }
 
         .amap-container {
@@ -60,7 +60,7 @@
         div.wrapper {
             position: absolute;
             top: 5%;
-            left: 60%;
+            right: 1%;
             width: 600px;
             height: 900px;
         }
@@ -104,7 +104,7 @@
 <script src="//webapi.amap.com/maps?v=1.4.15&key=736114382e4cd8877312b9345a0f3c9e"></script>
 <script src="//webapi.amap.com/loca?v=1.3.2&key=736114382e4cd8877312b9345a0f3c9e"></script>
 <script src="//a.amap.com/Loca/static/dist/jquery.min.js"></script>
-<script src="//cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
+<script src="/static/plotly.min.js" charset="utf-8"></script>
 <script>
     let infoWindow, map, level = 12,
         center = {lng: 120.14325, lat: 30.281472}; // amap location
@@ -149,6 +149,7 @@
         display_fire_station();
         display_population();
         display_enterprise();
+        display_duration();
     }
 
     function loadScript(src, callback) {
@@ -183,16 +184,17 @@
                 "fire station": false,
                 "population & enterprise": false,
                 "monthly": false,
+                "duration": false,
             }
         }
         initComplete.info[file] = true;
 
         if (Object.values(initComplete.info).every(value => value)) {
             console.log("All data loaded!");
-            redrawMap();
-
             drawLeftPanel();
             drawRightPanel();
+
+            redrawMap();
         }
     }
 </script>
@@ -212,7 +214,6 @@
         zIndex: 300
     });
 
-    /* filter is a function that returns bool */
     function display_fire() {
         let display_fire_list = [];
         for (const fireElement of fire) {
@@ -371,6 +372,45 @@
     loadScript("/static/monthly.js", function () {
         initComplete("monthly");
     })
+</script>
+<!-- Duration statistics -->
+<script>
+    loadScript("/static/duration.js", function () {
+        initComplete("duration");
+    })
+
+    let durationLayer = new Loca.PolygonLayer({
+        map: map,
+        eventSupport: true,
+        zIndex: 303
+    });
+
+    function display_duration() {
+
+        let idx = drawLeftPanel.settings.minute === 5 ? 0 : drawLeftPanel.settings.minute === 7 ? 1 : 2;
+
+        let display_duration_list = [];
+        for (const durationElement of duration) {
+            for (const fire_station_element of fire_station) {
+                if (fire_station_element["station_code"] === durationElement["station_code"]) {
+                    if (beforeEndTime(fire_station_element)) {
+                        display_duration_list.push(...durationElement["data"][idx]);
+                    }
+                    break;
+                }
+            }
+        }
+        durationLayer.setData(display_duration_list, {
+            lnglat: 'lnglat'
+        });
+        durationLayer.setOptions({
+            style: {
+                color: '#69ff4f',
+                opacity: 0.5,
+            }
+        });
+        durationLayer.render();
+    }
 </script>
 </body>
 </html>

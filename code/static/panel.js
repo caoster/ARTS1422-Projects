@@ -76,6 +76,7 @@ function drawLeftPanel() {
         drawLeftPanel.settings.fire_station ? fireStationLayer.show() : fireStationLayer.hide();
         drawLeftPanel.settings.population ? populationLayer.show() : populationLayer.hide();
         drawLeftPanel.settings.enterprise ? enterpriseLayer.show() : enterpriseLayer.hide();
+        display_duration();
         drawLeftPanel.settings.show_area ? durationLayer.show() : durationLayer.hide();
     }
 
