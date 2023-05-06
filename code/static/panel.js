@@ -54,8 +54,8 @@ function drawLeftPanel() {
             else if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.fire_station_button, event.offsetX, event.offsetY)) drawLeftPanel.settings.fire_station = !drawLeftPanel.settings.fire_station;
             else if (drawLeftPanel.ctx.isPointInPath(display_area, event.offsetX, event.offsetY)) drawLeftPanel.settings.show_area = !drawLeftPanel.settings.show_area;
             else if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.scale_5_button, event.offsetX, event.offsetY) && drawLeftPanel.settings.show_area) drawLeftPanel.settings.minute = 5;
-            else if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.scale_10_button, event.offsetX, event.offsetY) && drawLeftPanel.settings.show_area) drawLeftPanel.settings.minute = 10;
-            else if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.scale_15_button, event.offsetX, event.offsetY) && drawLeftPanel.settings.show_area) drawLeftPanel.settings.minute = 15;
+            else if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.scale_7_button, event.offsetX, event.offsetY) && drawLeftPanel.settings.show_area) drawLeftPanel.settings.minute = 7;
+            else if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.scale_11_button, event.offsetX, event.offsetY) && drawLeftPanel.settings.show_area) drawLeftPanel.settings.minute = 11;
             else if (drawLeftPanel.ctx.isPointInPath(drawLeftPanel.population_button, event.offsetX, event.offsetY)) {
                 drawLeftPanel.settings.population = !drawLeftPanel.settings.population;
                 if (drawLeftPanel.settings.population) drawLeftPanel.settings.enterprise = false;
@@ -76,6 +76,7 @@ function drawLeftPanel() {
         drawLeftPanel.settings.fire_station ? fireStationLayer.show() : fireStationLayer.hide();
         drawLeftPanel.settings.population ? populationLayer.show() : populationLayer.hide();
         drawLeftPanel.settings.enterprise ? enterpriseLayer.show() : enterpriseLayer.hide();
+        drawLeftPanel.settings.show_area ? durationLayer.show() : durationLayer.hide();
     }
 
     /* Background */
@@ -123,23 +124,23 @@ function drawLeftPanel() {
     }
     drawLeftPanel.ctx.fillText("5", 44, 220);
 
-    if (drawLeftPanel.settings.show_area && drawLeftPanel.settings.minute === 10) {
-        drawLeftPanel.scale_10_button = rounded_rect(drawLeftPanel.ctx, 71, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
+    if (drawLeftPanel.settings.show_area && drawLeftPanel.settings.minute === 7) {
+        drawLeftPanel.scale_7_button = rounded_rect(drawLeftPanel.ctx, 71, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     } else {
-        drawLeftPanel.scale_10_button = rounded_rect(drawLeftPanel.ctx, 71, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
+        drawLeftPanel.scale_7_button = rounded_rect(drawLeftPanel.ctx, 71, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     }
-    drawLeftPanel.ctx.fillText("10", 88, 220);
+    drawLeftPanel.ctx.fillText("7", 88, 220);
 
-    if (drawLeftPanel.settings.show_area && drawLeftPanel.settings.minute === 15) {
-        drawLeftPanel.scale_15_button = rounded_rect(drawLeftPanel.ctx, 115, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
+    if (drawLeftPanel.settings.show_area && drawLeftPanel.settings.minute === 11) {
+        drawLeftPanel.scale_11_button = rounded_rect(drawLeftPanel.ctx, 115, 194, 35, 40, 10, 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0.5)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     } else {
-        drawLeftPanel.scale_15_button = rounded_rect(drawLeftPanel.ctx, 115, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
+        drawLeftPanel.scale_11_button = rounded_rect(drawLeftPanel.ctx, 115, 194, 35, 40, 10, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 0)');
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     }
-    drawLeftPanel.ctx.fillText("15", 132, 220);
+    drawLeftPanel.ctx.fillText("11", 132, 220);
     if (drawLeftPanel.settings.show_area)
         drawLeftPanel.ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     else
@@ -717,10 +718,9 @@ function drawRightMidRightPanel() {
         dimensions: [{
             // range: [1, 5],
             label: '\u706b\u60c5', // 火情
-            values: data.map(row => row['level'])
-        }, {
-            label: '\u6c14\u6e29', // 气温
-            values: data.map(row => row['temp'])
+            values: data.map(row => {
+                return Math.min(5, Number(row['level']));
+            })
         }, {
             label: '\u4eba\u53e3', // 人口
             values: data.map(row => row['popu'])
