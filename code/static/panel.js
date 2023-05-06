@@ -193,7 +193,7 @@ function drawRightPanel() {
     drawRightPanel.canvas.height = 920;
     drawRightPanel.ctx = drawRightPanel.canvas.getContext("2d");
 
-    rounded_rect(drawRightPanel.ctx, 5, 5, 600 - 10, 920 - 10, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)');
+    rounded_rect(drawRightPanel.ctx, 5, 5, 600 - 10, 920 - 10, 20, 'rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.7)');
     drawRightPanel.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
     drawRightPanel.ctx.lineWidth = 2;
     drawRightPanel.ctx.moveTo(15, 300 + 20);
@@ -659,58 +659,72 @@ function drawRightMidLeftPanel(visit) {
     let cBox = document.getElementById("right-mid-left-panel");
     cBox.appendChild(drawRightMidLeftPanel.canvas);
 
+    if (drawRightMidLeftPanel.selected === undefined) drawRightMidLeftPanel.selected = "";
+    drawRightMidLeftPanel.canvas.addEventListener("click", (event) => {
+        let clicked = false;
+        for (const arc of drawRightMidLeftPanel.arcs) {
+            if (drawRightMidLeftPanel.ctx.isPointInPath(arc, event.offsetX, event.offsetY) && drawRightMidLeftPanel.selected !== arc.reason) {
+                drawRightMidLeftPanel.selected = arc.reason;
+                clicked = true;
+                break;
+            }
+        }
+        if (!clicked) drawRightMidLeftPanel.selected = "";
+
+        redraw();
+    });
+
     function getColor(reason) {
         let scheme = {
-    '居住场所': '#C0392B',
-    '其他': '#D4AC0D',
-    '垃圾堆': '#006666',
-    '轿车': '#6A1B9A',
-    '餐饮场所': '#AD1457',
-    '学校': '#283593',
-    '商业场所': '#00897B',
-    '工地': '#D84315',
-    '货车': '#7E57C2',
-    '办公场所': '#AFB42B',
-    '露天堆垛': '#F4511E',
-    '公园': '#546E7A',
-    '厂房': '#A1887F',
-    '物资仓储': '#4DB6AC',
-    '宾馆': '#9C27B0',
-    '室外设备': '#FF7043',
-    '绿化带': '#66BB6A',
-    '交通枢纽': '#5E35B1',
-    '客车': '#EC407A',
-    '垃圾箱': '#FF80AB',
-    '电动车': '#29B6F6',
-    '露天场所': '#9CCC65',
-    '汽车库': '#FFB74D',
-    '娱乐场所': '#BA68C8',
-    '医疗机构': '#78909C',
-    '室外市场': '#A1887F',
-    '通信场所': '#7CB342',
-    '特种车': '#8D6E63',
-    '宗教场所': '#90A4AE',
-    '石油化工': '#8E24AA',
-    '科研试验': '#9E9D24',
-    '体育场馆': '#8C9EFF',
-    '轨道交通': '#43A047',
-    '室内农副': '#7E57C2',
-    '修车库': '#AB47BC',
-    '船舶': '#FF7043',
-    '加油站': '#5C6BC0',
-    '会展中心': '#26A69A',
-    '文物古建筑': '#EF6C00',
-    '文博馆': '#CE93D8',
-    '垃圾场': '#FFCC80',
-    '摩托车': '#C5E1A5',
-    '废品回收': '#FFAB91',
-    '森林': '#80CBC4',
-    '金融交易': '#9FA8DA',
-    '养老院': '#BCAAA4',
-}
+            '居住场所': 'rgba(192,57,43,0.75)',
+            '其他': 'rgba(212,172,13,0.75)',
+            '垃圾堆': 'rgba(0,102,102,0.75)',
+            '轿车': 'rgba(106,27,154,0.75)',
+            '餐饮场所': 'rgba(173,20,87,0.75)',
+            '学校': 'rgba(40,53,147,0.75)',
+            '商业场所': 'rgba(0,137,123,0.75)',
+            '工地': 'rgba(216,67,21,0.75)',
+            '货车': 'rgba(126,87,194,0.75)',
+            '办公场所': 'rgba(175,180,43,0.75)',
+            '露天堆垛': 'rgba(244,81,30,0.75)',
+            '公园': 'rgba(84,110,122,0.75)',
+            '厂房': 'rgba(161,136,127,0.75)',
+            '物资仓储': 'rgba(77,182,172,0.75)',
+            '宾馆': 'rgba(156,39,176,0.75)',
+            '室外设备': 'rgba(255,112,67,0.75)',
+            '绿化带': 'rgba(102,187,106,0.75)',
+            '交通枢纽': 'rgba(94,53,177,0.75)',
+            '客车': 'rgba(236,64,122,0.75)',
+            '垃圾箱': 'rgba(255,128,171,0.75)',
+            '电动车': 'rgba(41,182,246,0.75)',
+            '露天场所': 'rgba(156,204,101,0.75)',
+            '汽车库': 'rgba(255,183,77,0.75)',
+            '娱乐场所': 'rgba(186,104,200,0.75)',
+            '医疗机构': 'rgba(120,144,156,0.75)',
+            '室外市场': 'rgba(161,136,127,0.75)',
+            '通信场所': 'rgba(124,179,66,0.75)',
+            '特种车': 'rgba(141,110,99,0.75)',
+            '宗教场所': 'rgba(144,164,174,0.75)',
+            '石油化工': 'rgba(142,36,170,0.75)',
+            '科研试验': 'rgba(158,157,36,0.75)',
+            '体育场馆': 'rgba(140,158,255,0.75)',
+            '轨道交通': 'rgba(67,160,71,0.75)',
+            '室内农副': 'rgba(126,87,194,0.75)',
+            '修车库': 'rgba(171,71,188,0.75)',
+            '船舶': 'rgba(255,112,67,0.75)',
+            '加油站': 'rgba(92,107,192,0.75)',
+            '会展中心': 'rgba(38,166,154,0.75)',
+            '文物古建筑': 'rgba(239,108,0,0.75)',
+            '文博馆': 'rgba(206,147,216,0.75)',
+            '垃圾场': 'rgba(255,204,128,0.75)',
+            '摩托车': 'rgba(197,225,165,0.75)',
+            '废品回收': 'rgba(255,171,145,0.75)',
+            '森林': 'rgba(128,203,196,0.75)',
+            '金融交易': 'rgba(159,168,218,0.75)',
+            '养老院': 'rgba(188,170,164,0.75)',
+        }
 
-
-        let else_color = '#b15928';
+        let else_color = 'rgba(177,89,40,0.75)';
         if (scheme[reason] === undefined) return else_color;
         return scheme[reason];
     }
@@ -737,22 +751,33 @@ function drawRightMidLeftPanel(visit) {
             .reduce((a, b) => (a + b));
         let idx = 0;
         drawRightMidLeftPanel.ctx.font = "18px Verdana";
+        drawRightMidLeftPanel.arcs = [];
+
         for (let reason of count_reason) {
             let portionAngle = (reason[1] / sum) * 2 * Math.PI;
-            drawRightMidLeftPanel.ctx.beginPath();
-            drawRightMidLeftPanel.ctx.arc(125, 100, 100, currentAngle, currentAngle + portionAngle);
+            let path = new Path2D();
+
+            if (drawRightMidLeftPanel.selected === reason[0]) {
+                drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]).replace(/[^,]+(?=\))/, "1");
+                path.arc(125, 100, 105, currentAngle, currentAngle + portionAngle);
+            } else if (drawRightMidLeftPanel.selected === "") {
+                drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]).replace(/[^,]+(?=\))/, "1");
+                path.arc(125, 100, 100, currentAngle, currentAngle + portionAngle);
+            } else {
+                drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]);
+                path.arc(125, 100, 100, currentAngle, currentAngle + portionAngle);
+            }
             currentAngle += portionAngle;
-            drawRightMidLeftPanel.ctx.lineTo(125, 100);
-            drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]);
-            drawRightMidLeftPanel.ctx.fill();
+            path.lineTo(125, 100);
 
             if (idx < position.length) {
                 let pos = position[idx];
-                drawRightMidLeftPanel.ctx.rect(pos[0], pos[1], 20, 20);
-                drawRightMidLeftPanel.ctx.fill();
+                path.rect(pos[0], pos[1], 20, 20);
                 drawRightMidLeftPanel.ctx.fillText(reason[0], pos[0] + 25, pos[1] + 17);
             }
-
+            drawRightMidLeftPanel.ctx.fill(path);
+            path.reason = reason[0];
+            drawRightMidLeftPanel.arcs.push(path);
             ++idx;
         }
     }
