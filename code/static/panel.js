@@ -659,9 +659,23 @@ function drawRightMidLeftPanel(visit) {
     let cBox = document.getElementById("right-mid-left-panel");
     cBox.appendChild(drawRightMidLeftPanel.canvas);
 
-    function getColor(idx) {
-        let scheme = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928']
-        return scheme[Math.min(idx, scheme.length)];
+    function getColor(reason) {
+        let scheme = {
+            "居住场所": "#a6cee3",
+            "其他": "#1f78b4",
+            "垃圾堆": "#b2df8a",
+            "轿车": "#33a02c",
+            "餐饮场所": "#fb9a99",
+            "学校": "#e31a1c",
+            "商业场所": "#fdbf6f",
+            "工地": "#ff7f00",
+            "货车": "#cab2d6",
+            "办公场所": "#6a3d9a",
+            "露天堆垛": "#ffff99",
+        }
+        let else_color = '#b15928';
+        if (scheme[reason] === undefined) return else_color;
+        return scheme[reason];
     }
 
     redraw();
@@ -692,7 +706,7 @@ function drawRightMidLeftPanel(visit) {
             drawRightMidLeftPanel.ctx.arc(125, 100, 100, currentAngle, currentAngle + portionAngle);
             currentAngle += portionAngle;
             drawRightMidLeftPanel.ctx.lineTo(125, 100);
-            drawRightMidLeftPanel.ctx.fillStyle = getColor(idx);
+            drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]);
             drawRightMidLeftPanel.ctx.fill();
 
             if (idx < position.length) {
