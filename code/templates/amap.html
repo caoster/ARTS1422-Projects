@@ -281,13 +281,13 @@
     let enterpriseLayer = new Loca.PolygonLayer({
         map: map,
         eventSupport: true,
-        zIndex: 298
+        zIndex: 297
     });
 
     let populationLayer = new Loca.PolygonLayer({
         map: map,
         eventSupport: true,
-        zIndex: 299
+        zIndex: 298
     });
 
     function display_population() {
@@ -382,7 +382,7 @@
     let durationLayer = new Loca.PolygonLayer({
         map: map,
         eventSupport: true,
-        zIndex: 303
+        zIndex: 299
     });
 
     function display_duration() {
@@ -406,7 +406,7 @@
         durationLayer.setOptions({
             style: {
                 color: '#69ff4f',
-                opacity: 0.5,
+                opacity: 0.15,
             }
         });
         durationLayer.render();

@@ -793,11 +793,9 @@ function drawRightMidRightPanel() {
         },
 
         dimensions: [{
-            // range: [1, 5],
+            range: [0, 100],
             label: '\u706b\u60c5', // 火情
-            values: data.map(row => {
-                return Math.min(5, Number(row['level']));
-            })
+            values: data.map(row => row['level'])
         }, {
             label: '\u4eba\u53e3', // 人口
             values: data.map(row => row['popu'])
@@ -812,7 +810,7 @@ function drawRightMidRightPanel() {
         plot_bgcolor: "rgba(0, 0, 0, 0)",
         paper_bgcolor: "rgba(0, 0, 0, 0)",
         margin: {
-            l: 30,
+            l: 40,
             r: 45,
             b: 35,
             t: 50,
@@ -872,8 +870,11 @@ function drawRightBotPanel() {
             }),
             tickvals: ticks.map((t) => new Date(t)),
         }, {
-            label: '\u6570\u91cf', // 数量
-            values: filtered_station.map(row => row['count'])
+            label: '\u5e73\u5747\u6570\u91cf', // 平均数量
+            values: filtered_station.map(row => {
+                if (begin < row["time"]) return row['count'] / ((end - row["time"]) / 1000 / 3600 / 12)
+                else return row['count'] / ((end - begin) / 1000 / 3600 / 12)
+            })
         }, {
             label: '\u4eba\u53e3', // 人口
             values: filtered_station.map(row => row['popu'])
