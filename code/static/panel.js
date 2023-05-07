@@ -852,7 +852,14 @@ function drawRightBotPanel() {
         type: 'parcoords',
         line: {
             color: data.map(row => row['level']),
-            colorscale: "Bluered"
+            colorscale: [
+                [0.0, 'rgba(5,10,172,0.75)'],
+                [0.35, 'rgba(106,137,247,0.75)'],
+                [0.5, 'rgba(190,190,190,0.75)'],
+                [0.6, 'rgba(220,170,132,0.75)'],
+                [0.7, 'rgba(230,145,90,0.75)'],
+                [1.0, 'rgba(178,10,28,0.75)']
+            ]
         },
 
         dimensions: [{
@@ -866,8 +873,8 @@ function drawRightBotPanel() {
         }, {
             label: '\u5e73\u5747\u6570\u91cf', // 平均数量
             values: filtered_station.map(row => {
-                if (begin < row["time"]) return row['count'] / ((end - row["time"]) / 1000 / 3600 / 12)
-                else return row['count'] / ((end - begin) / 1000 / 3600 / 12)
+                if (begin < row["time"]) return row['count'] / ((end - row["time"]) / 1000 / 3600 / 24)
+                else return row['count'] / ((end - begin) / 1000 / 3600 / 24)
             })
         }, {
             label: '\u4eba\u53e3', // 人口

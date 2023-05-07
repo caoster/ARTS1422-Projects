@@ -20,7 +20,7 @@ def cal_level(fire_station, fire):
     for i in fire.values:
         if i[3] not in fire_station_name:
             fire_station_name.append(i[3])
-    station_ability = dict(zip(fire_station_name, [100 for i in range(len(fire_station_name))]))
+    station_ability = dict(zip(fire_station_name, [100 for _ in range(len(fire_station_name))]))
 
     def iter_once(idx):
         nonlocal station_ability, fire_value
@@ -31,14 +31,14 @@ def cal_level(fire_station, fire):
             if j[4] == "主战":
                 fire_value[j[0]][0] += station_ability[j[3]]
             else:
-                fire_value[j[0]][1] += station_ability[j[3]] * PORTION_ASSIST
+                fire_value[j[0]][1] += station_ability[j[3]]
         for j in range(len(fire_value)):
             if fire_value[j][0] == 0:
-                fire_value[j] = smallest_station * PORTION_ASSIST + math.sqrt(fire_value[j][1]) / PORTION_ASSIST
+                fire_value[j] = smallest_station * PORTION_ASSIST + math.sqrt(fire_value[j][1]) * PORTION_ASSIST * 10
             elif fire_value[j][1] == 0:
                 fire_value[j] = fire_value[j][0]
             else:
-                fire_value[j] = fire_value[j][0] + math.sqrt(fire_value[j][1]) / PORTION_ASSIST
+                fire_value[j] = fire_value[j][0] + math.sqrt(fire_value[j][1]) * PORTION_ASSIST * 10
 
         for j in fire.values:
             if j[4] == "主战":
