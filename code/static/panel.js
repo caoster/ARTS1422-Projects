@@ -237,13 +237,13 @@ function drawRightUpPanel() {
     let totalXNumber = 5;
 
     drawRightUpPanel.properties = {
-        'avg_temp': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(255, 255, 255, 0.6)', 'show': false, 'clickObj': undefined},
-        'amt_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(26, 166, 244, 1)', 'show': false, 'clickObj': undefined},
-        'num_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(250, 255, 0, 1)', 'show': false, 'clickObj': undefined},
-        'num_snow': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(178, 255, 218, 1)', 'show': false, 'clickObj': undefined},
-        'num_storm': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(119, 98, 251, 1)', 'show': false, 'clickObj': undefined},
-        'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false, 'clickObj': undefined},
-        'max_level_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 0.5)', 'show': false, 'clickObj': undefined},
+        'avg_temp': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(255, 255, 255, 0.6)', 'show': false, 'clickObj': undefined },
+        'amt_rain': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(26, 166, 244, 1)', 'show': false, 'clickObj': undefined },
+        'num_rain': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(250, 255, 0, 1)', 'show': false, 'clickObj': undefined },
+        'num_snow': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(178, 255, 218, 1)', 'show': false, 'clickObj': undefined },
+        'num_storm': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(119, 98, 251, 1)', 'show': false, 'clickObj': undefined },
+        'num_fire': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false, 'clickObj': undefined },
+        'max_level_fire': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 0.5)', 'show': false, 'clickObj': undefined },
     }
     drawRightUpPanel.property_list = [
         'avg_temp',
@@ -300,13 +300,13 @@ function drawRightUpPanel() {
         for (let i = 0; i < monthly.length; i++) {
             let x = originX + (bWidth + bMargin) * i + bMargin + bWidth / 2;
 
-            points.avg_temp.push({x: x, y: originY - cHeight * (monthly[i].avg_temp - prop.avg_temp.rng_min) / (prop.avg_temp.rng_max - prop.avg_temp.rng_min)});
-            points.amt_rain.push({x: x, y: originY - cHeight * (monthly[i].amt_rain - prop.amt_rain.rng_min) / (prop.amt_rain.rng_max - prop.amt_rain.rng_min)});
-            points.num_rain.push({x: x, y: originY - cHeight * (monthly[i].num_rain - prop.num_rain.rng_min) / (prop.num_rain.rng_max - prop.num_rain.rng_min)});
-            points.num_snow.push({x: x, y: originY - cHeight * (monthly[i].num_snow - prop.num_snow.rng_min) / (prop.num_snow.rng_max - prop.num_snow.rng_min)});
-            points.num_storm.push({x: x, y: originY - cHeight * (monthly[i].num_storm - prop.num_storm.rng_min) / (prop.num_storm.rng_max - prop.num_storm.rng_min)});
-            points.num_fire.push({x: x, y: originY - cHeight * (monthly[i].num_fire - prop.num_fire.rng_min) / (prop.num_fire.rng_max - prop.num_fire.rng_min)});
-            points.max_level_fire.push({x: x, y: originY - cHeight * (monthly[i].max_level_fire - prop.max_level_fire.rng_min) / (prop.max_level_fire.rng_max - prop.max_level_fire.rng_min)});
+            points.avg_temp.push({ x: x, y: originY - cHeight * (monthly[i].avg_temp - prop.avg_temp.rng_min) / (prop.avg_temp.rng_max - prop.avg_temp.rng_min) });
+            points.amt_rain.push({ x: x, y: originY - cHeight * (monthly[i].amt_rain - prop.amt_rain.rng_min) / (prop.amt_rain.rng_max - prop.amt_rain.rng_min) });
+            points.num_rain.push({ x: x, y: originY - cHeight * (monthly[i].num_rain - prop.num_rain.rng_min) / (prop.num_rain.rng_max - prop.num_rain.rng_min) });
+            points.num_snow.push({ x: x, y: originY - cHeight * (monthly[i].num_snow - prop.num_snow.rng_min) / (prop.num_snow.rng_max - prop.num_snow.rng_min) });
+            points.num_storm.push({ x: x, y: originY - cHeight * (monthly[i].num_storm - prop.num_storm.rng_min) / (prop.num_storm.rng_max - prop.num_storm.rng_min) });
+            points.num_fire.push({ x: x, y: originY - cHeight * (monthly[i].num_fire - prop.num_fire.rng_min) / (prop.num_fire.rng_max - prop.num_fire.rng_min) });
+            points.max_level_fire.push({ x: x, y: originY - cHeight * (monthly[i].max_level_fire - prop.max_level_fire.rng_min) / (prop.max_level_fire.rng_max - prop.max_level_fire.rng_min) });
         }
         drawBody();
     }
@@ -464,8 +464,8 @@ function drawRightUpPanel() {
         }
 
         return {
-            pA: {x: pAx, y: pAy},
-            pB: {x: pBx, y: pBy}
+            pA: { x: pAx, y: pAy },
+            pB: { x: pBx, y: pBy }
         }
     }
 
@@ -783,18 +783,30 @@ function drawRightMidRightPanel() {
                 [0.6, 'rgba(220,170,132,0.75)'],
                 [0.7, 'rgba(230,145,90,0.75)'],
                 [1.0, 'rgba(178,10,28,0.75)']
-            ]
+            ],
+        },
+        unselected: {
+            line: {
+                color: "#313131",
+                opacity: 0.1
+            }
         },
 
         dimensions: [{
             range: [0, 100],
-            label: '\u706b\u60c5', // 火情
+            label: '\u706b\u60c5\uff08\u961f\uff09', // 火情（队）
+            tickvals: [0, 100], // 设置自定义刻度标签的位置
+        ticktext: ['\u5c0f', '\u5927'], // 设置自定义刻度标签的文本 小 大
             values: data.filter(typeSelected).map(row => row['level'])
         }, {
-            label: '\u4eba\u53e3', // 人口
+            label: '\u4eba\u53e3\u5bc6\u5ea6', // 人口密度
+            tickvals: [0, 17574], // 设置自定义刻度标签的位置
+            ticktext: ['\u5c11','\u591a'], // 设置自定义刻度标签的文本 少 多
             values: data.filter(typeSelected).map(row => row['popu'])
         }, {
-            label: '\u4f01\u4e1a', // 企业
+            label: '\u4f01\u4e1a\u5bc6\u5ea6', // 企业密度
+            tickvals: [0, 15919], // 设置自定义刻度标签的位置
+            ticktext: ['\u5c11','\u591a'], // 设置自定义刻度标签的文本 少 多
             values: data.filter(typeSelected).map(row => row['indu'])
         }]
     }];
@@ -816,7 +828,7 @@ function drawRightMidRightPanel() {
         },
     };
 
-    Plotly.newPlot('right-mid-right-panel', points, layout, {displayModeBar: false});
+    Plotly.newPlot('right-mid-right-panel', points, layout, { displayModeBar: false });
 }
 
 function drawRightBotPanel() {
@@ -843,7 +855,7 @@ function drawRightBotPanel() {
 
     function linspace(start, stop) {
         const step = (stop - start) / 4;
-        return Array.from({length: 5}, (_, i) => start + step * i);
+        return Array.from({ length: 5 }, (_, i) => start + step * i);
     }
 
     let ticks = linspace(Math.min(...filtered_station.map(row => (row['time'].getTime()))), Math.max(...filtered_station.map(row => (row['time'].getTime()))));
@@ -864,7 +876,7 @@ function drawRightBotPanel() {
             ]
         },
 
-        dimensions: [ {
+        dimensions: [{
             label: '\u7b49\u7ea7', // 等级
             values: filtered_station.map(row => row['level'])
         }, {
@@ -876,16 +888,16 @@ function drawRightBotPanel() {
             }),
             tickvals: ticks.map((t) => new Date(t)),
         }, {
-            label: '\u5e73\u5747\u6570\u91cf', // 平均数量
+            label: '\u51fa\u8b66\u9891\u7387\uff08\u6b21\u002f\u5929\uff09', // 出警频率（次/天）
             values: filtered_station.map(row => {
                 if (begin < row["time"]) return row['count'] / ((end - row["time"]) / 1000 / 3600 / 24)
                 else return row['count'] / ((end - begin) / 1000 / 3600 / 24)
             })
         }, {
-            label: '\u4eba\u53e3', // 人口
+            label: '\u4eba\u53e3\u5bc6\u5ea6', // 人口密度
             values: filtered_station.map(row => row['popu'])
         }, {
-            label: '\u4f01\u4e1a', // 企业
+            label: '\u4f01\u4e1a\u5bc6\u5ea6', // 企业密度
             values: filtered_station.map(row => row['indu'])
         }]
     }];
@@ -908,5 +920,5 @@ function drawRightBotPanel() {
         },
     };
 
-    Plotly.newPlot('right-bot-panel', points, layout, {displayModeBar: false});
+    Plotly.newPlot('right-bot-panel', points, layout, { displayModeBar: false });
 }
