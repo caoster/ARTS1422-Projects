@@ -1,6 +1,6 @@
 function radius_fire(level) {
     /* Map [0, 100] to [150, 600] */
-    return level * 4.5 + 150;
+    return level * 3 + 50;
 }
 
 function color_fire(value) {
@@ -17,18 +17,21 @@ function color_fire(value) {
 }
 
 function radius_fire_station(level) {
-    if (level === 1) return 250;
-    return 500;
+    if (level>=0 && level<20) return 50;
+    if (level>=20 && level<40) return 100;
+    if (level>=40 && level<60) return 150;
+    if (level>=60 && level<80) return 200;
+    if (level>=80 && level<=100) return 250;
 }
 
 function opacity_population(data) {
     // max: 17573.560
     // min: 0.103
-    if (data < 1169) return 0.1;
-    if (data < 1447) return 0.2;
-    if (data < 1976) return 0.3;
-    if (data < 3418) return 0.5;
-    return 0.7;
+    if (data < 1169) return 0.05;
+    if (data < 1447) return 0.1;
+    if (data < 1976) return 0.2;
+    if (data < 3418) return 0.3;
+    return 0.4;
 }
 
 function opacity_enterprise(capital, count) {
@@ -45,8 +48,8 @@ function opacity_enterprise(capital, count) {
     if (count < 1549) b = 0.1;
     else if (count < 2322) b = 0.2;
     else if (count < 3558) b = 0.3;
-    else if (count < 6376) b = 0.5;
-    else b = 0.7;
+    else if (count < 6376) b = 0.4;
+    else b = 0.5;
 
     // return 2 * a * b / (a + b);
     return b

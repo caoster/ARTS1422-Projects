@@ -121,7 +121,7 @@
 
     map = new AMap.Map("mapContainer",
         {
-            mapStyle: "amap://styles/15be39cd092f01f713ec68eebbb76121",
+            mapStyle: "amap://styles/grey",
             center: new AMap.LngLat(center.lng, center.lat),
             level: level,
             keyboardEnable: true,
@@ -277,7 +277,7 @@
                 radius: function (obj) {
                     return radius_fire_station(obj.value.level);
                 },
-                color: 'rgba(27, 169, 101, 0.8)',
+                color: "rgba(27, 169, 101, 0.8)",
             }
         });
         fireStationLayer.render();
@@ -418,7 +418,7 @@
         });
         durationLayer.setOptions({
             style: {
-                color: '#69ff4f',
+                color: '#9AFF88',
                 opacity: 0.15,
             }
         });
