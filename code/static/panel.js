@@ -753,6 +753,8 @@ function drawRightMidLeftPanel(visit) {
         drawRightMidLeftPanel.ctx.font = "18px Verdana";
         drawRightMidLeftPanel.arcs = [];
 
+        let displayText = [0, 0, ""];
+
         for (let reason of count_reason) {
             let portionAngle = (reason[1] / sum) * 2 * Math.PI;
             let path = new Path2D();
@@ -760,6 +762,11 @@ function drawRightMidLeftPanel(visit) {
             if (typeSelected.filterType === reason[0]) {
                 drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]).replace(/[^,]+(?=\))/, "1");
                 path.arc(125, 100, 105, currentAngle, currentAngle + portionAngle);
+                displayText = [
+                    125 + Math.cos(currentAngle + portionAngle / 2) * 50,
+                    100 + Math.sin(currentAngle + portionAngle / 2) * 50,
+                    String(Math.trunc(reason[1] / sum * 1000) / 10) + "%"
+                ];
             } else if (typeSelected.filterType === "") {
                 drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]).replace(/[^,]+(?=\))/, "1");
                 path.arc(125, 100, 100, currentAngle, currentAngle + portionAngle);
@@ -780,6 +787,11 @@ function drawRightMidLeftPanel(visit) {
             drawRightMidLeftPanel.arcs.push(path);
             ++idx;
         }
+        drawRightMidLeftPanel.ctx.font = "22px Verdana";
+        drawRightMidLeftPanel.ctx.fillStyle = "black";
+        drawRightMidLeftPanel.ctx.textAlign = "center";
+        drawRightMidLeftPanel.ctx.fillText(displayText[2], displayText[0], displayText[1]);
+        drawRightMidLeftPanel.ctx.textAlign = "left";
         redrawMap();
         drawRightMidRightPanel();
         drawRightBotPanel(); /* In case of losing context */
