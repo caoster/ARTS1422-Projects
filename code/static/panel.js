@@ -795,18 +795,12 @@ function drawRightMidRightPanel() {
         dimensions: [{
             range: [0, 100],
             label: '\u706b\u60c5\uff08\u961f\uff09', // 火情（队）
-            tickvals: [0, 100], // 设置自定义刻度标签的位置
-        ticktext: ['\u5c0f', '\u5927'], // 设置自定义刻度标签的文本 小 大
             values: data.filter(typeSelected).map(row => row['level'])
         }, {
             label: '\u4eba\u53e3\u5bc6\u5ea6', // 人口密度
-            tickvals: [0, 17574], // 设置自定义刻度标签的位置
-            ticktext: ['\u5c11','\u591a'], // 设置自定义刻度标签的文本 少 多
             values: data.filter(typeSelected).map(row => row['popu'])
         }, {
             label: '\u4f01\u4e1a\u5bc6\u5ea6', // 企业密度
-            tickvals: [0, 15919], // 设置自定义刻度标签的位置
-            ticktext: ['\u5c11','\u591a'], // 设置自定义刻度标签的文本 少 多
             values: data.filter(typeSelected).map(row => row['indu'])
         }]
     }];
@@ -874,6 +868,12 @@ function drawRightBotPanel() {
                 [0.7, 'rgba(230,145,90,0.75)'],
                 [1.0, 'rgba(178,10,28,0.75)']
             ]
+        },
+        unselected: {
+            line: {
+                color: "#313131",
+                opacity: 0.1
+            }
         },
 
         dimensions: [{
