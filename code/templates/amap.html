@@ -177,6 +177,22 @@
         return obj.time <= end;
     }
 
+    function typeSelected(obj) {
+        if (typeSelected.filterType === "")
+            return true;
+        else
+            return obj['type'] === typeSelected.filterType
+    }
+
+    typeSelected.filterType = "";
+
+    function typeNotSelected(obj) {
+        if (typeSelected.filterType === "")
+            return false;
+        else
+            return obj['type'] !== typeSelected.filterType
+    }
+
     function initComplete(file) {
         if (initComplete.info === undefined) {
             initComplete.info = {
@@ -215,12 +231,7 @@
     });
 
     function display_fire() {
-        let display_fire_list = [];
-        for (const fireElement of fire) {
-            if (inTimePeriod(fireElement)) {
-                display_fire_list.push(fireElement);
-            }
-        }
+        let display_fire_list = fire.filter(inTimePeriod);
         fireLayer.setData(display_fire_list, {lnglat: 'lnglat'});
         fireLayer.setOptions({
             unit: 'meter',
@@ -228,7 +239,9 @@
                 radius: function (obj) {
                     return radius_fire(obj.value.level);
                 },
-                color: 'rgba(251, 61, 95, 0.8)',
+                color: function (obj) {
+                    return color_fire(obj.value);
+                },
             }
         });
         fireLayer.render();

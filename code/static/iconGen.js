@@ -1,16 +1,19 @@
 function radius_fire(level) {
-    switch (level) {
-        case 1:
-            return 150;
-        case 2:
-            return 300;
-        case 3:
-            return 450;
-        case 4:
-            return 600;
-        default:
-            return 150;
+    /* Map [0, 100] to [150, 600] */
+    return level * 4.5 + 150;
+}
+
+function color_fire(value) {
+    let opacity = 0.8;
+    if (typeSelected.filterType === "") {
+        /* Map [0, 100] to [0.4, 0.7] */
+        opacity = value.level / 100 * 0.3 + 0.4;
+    } else if (typeSelected(value)) {
+        opacity = 0.9;
+    } else {
+        opacity = 0.1;
     }
+    return `rgba(251, 61, 95, ${opacity})`;
 }
 
 function radius_fire_station(level) {

@@ -788,20 +788,29 @@ function drawRightMidRightPanel() {
     let points = [{
         type: 'parcoords',
         line: {
-            color: data.map(row => row['level']),
-            colorscale: "Bluered"
+            cmin: 0,
+            cmax: 100,
+            color: data.filter(typeSelected).map(row => row['level']),
+            colorscale: [
+                [0.0, 'rgba(5,10,172,0.75)'],
+                [0.35, 'rgba(106,137,247,0.75)'],
+                [0.5, 'rgba(190,190,190,0.75)'],
+                [0.6, 'rgba(220,170,132,0.75)'],
+                [0.7, 'rgba(230,145,90,0.75)'],
+                [1.0, 'rgba(178,10,28,0.75)']
+            ]
         },
 
         dimensions: [{
             range: [0, 100],
             label: '\u706b\u60c5', // 火情
-            values: data.map(row => row['level'])
+            values: data.filter(typeSelected).map(row => row['level'])
         }, {
             label: '\u4eba\u53e3', // 人口
-            values: data.map(row => row['popu'])
+            values: data.filter(typeSelected).map(row => row['popu'])
         }, {
             label: '\u4f01\u4e1a', // 企业
-            values: data.map(row => row['indu'])
+            values: data.filter(typeSelected).map(row => row['indu'])
         }]
     }];
 
