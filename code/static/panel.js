@@ -1,30 +1,30 @@
-function rounded_rect(ctx, left, top, width, height, radius, stroke, fill) {
-    let K = 4 * (Math.SQRT2 - 1) / 3; //constant for circles using Bezier curve.
+function rounded_rect(ctx, left, top, width, height, radius, stroke, fill, lineWidth = 3) {
+    let K = 4 * (Math.SQRT2 - 1) / 3; // constant for circles using Bezier curve.
     let right = left + width;
     let bottom = top + height;
     let path = new Path2D();
-    drawLeftPanel.ctx.beginPath();
+    ctx.beginPath();
     // top left
     path.moveTo(left + radius, top);
     // top right
     path.lineTo(right - radius, top);
-    //right top
+    // right top
     path.bezierCurveTo(right + radius * (K - 1), top, right, top + radius * (1 - K), right, top + radius);
-    //right bottom
+    // right bottom
     path.lineTo(right, bottom - radius);
-    //bottom right
+    // bottom right
     path.bezierCurveTo(right, bottom + radius * (K - 1), right + radius * (K - 1), bottom, right - radius, bottom);
-    //bottom left
+    // bottom left
     path.lineTo(left + radius, bottom);
-    //left bottom
+    // left bottom
     path.bezierCurveTo(left + radius * (1 - K), bottom, left, bottom + radius * (K - 1), left, bottom - radius);
-    //left top
+    // left top
     path.lineTo(left, top + radius);
-    //top left again
+    // top left again
     path.bezierCurveTo(left, top + radius * (1 - K), left + radius * (1 - K), top, left + radius, top);
 
     ctx.closePath();
-    ctx.lineWidth = 3;
+    ctx.lineWidth = lineWidth;
     ctx.strokeStyle = stroke;
     ctx.fillStyle = fill;
     ctx.stroke(path);
@@ -420,37 +420,7 @@ function drawRightUpPanel() {
         width *= 2;
         height *= 2;
         radius *= 2;
-        let K = 4 * (Math.SQRT2 - 1) / 3; //constant for circles using Bezier curve.
-        let right = left + width;
-        let bottom = top + height;
-        let path = new Path2D();
-        ctx.beginPath();
-        // top left
-        path.moveTo(left + radius, top);
-        // top right
-        path.lineTo(right - radius, top);
-        //right top
-        path.bezierCurveTo(right + radius * (K - 1), top, right, top + radius * (1 - K), right, top + radius);
-        //right bottom
-        path.lineTo(right, bottom - radius);
-        //bottom right
-        path.bezierCurveTo(right, bottom + radius * (K - 1), right + radius * (K - 1), bottom, right - radius, bottom);
-        //bottom left
-        path.lineTo(left + radius, bottom);
-        //left bottom
-        path.bezierCurveTo(left + radius * (1 - K), bottom, left, bottom + radius * (K - 1), left, bottom - radius);
-        //left top
-        path.lineTo(left, top + radius);
-        //top left again
-        path.bezierCurveTo(left, top + radius * (1 - K), left + radius * (1 - K), top, left + radius, top);
-
-        ctx.closePath();
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = stroke;
-        ctx.fillStyle = fill;
-        ctx.stroke(path);
-        ctx.fill(path);
-        return path;
+        return rounded_rect(ctx, left, top, width, height, radius, stroke, fill, 10);
     }
 
     function drawBezier(point, color) {
