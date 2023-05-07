@@ -11,7 +11,7 @@ function color_fire(value) {
     } else if (typeSelected(value)) {
         opacity = 0.9;
     } else {
-        opacity = 0.1;
+        opacity = 0;
     }
     return `rgba(251, 61, 95, ${opacity})`;
 }

@@ -659,17 +659,17 @@ function drawRightMidLeftPanel(visit) {
     let cBox = document.getElementById("right-mid-left-panel");
     cBox.appendChild(drawRightMidLeftPanel.canvas);
 
-    if (drawRightMidLeftPanel.selected === undefined) drawRightMidLeftPanel.selected = "";
+    // if (drawRightMidLeftPanel.selected === undefined) drawRightMidLeftPanel.selected = "";
     drawRightMidLeftPanel.canvas.addEventListener("click", (event) => {
         let clicked = false;
         for (const arc of drawRightMidLeftPanel.arcs) {
-            if (drawRightMidLeftPanel.ctx.isPointInPath(arc, event.offsetX, event.offsetY) && drawRightMidLeftPanel.selected !== arc.reason) {
-                drawRightMidLeftPanel.selected = arc.reason;
+            if (drawRightMidLeftPanel.ctx.isPointInPath(arc, event.offsetX, event.offsetY) && typeSelected.filterType !== arc.reason) {
+                typeSelected.filterType = arc.reason;
                 clicked = true;
                 break;
             }
         }
-        if (!clicked) drawRightMidLeftPanel.selected = "";
+        if (!clicked) typeSelected.filterType = "";
 
         redraw();
     });
@@ -757,10 +757,10 @@ function drawRightMidLeftPanel(visit) {
             let portionAngle = (reason[1] / sum) * 2 * Math.PI;
             let path = new Path2D();
 
-            if (drawRightMidLeftPanel.selected === reason[0]) {
+            if (typeSelected.filterType === reason[0]) {
                 drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]).replace(/[^,]+(?=\))/, "1");
                 path.arc(125, 100, 105, currentAngle, currentAngle + portionAngle);
-            } else if (drawRightMidLeftPanel.selected === "") {
+            } else if (typeSelected.filterType === "") {
                 drawRightMidLeftPanel.ctx.fillStyle = getColor(reason[0]).replace(/[^,]+(?=\))/, "1");
                 path.arc(125, 100, 100, currentAngle, currentAngle + portionAngle);
             } else {
@@ -780,6 +780,9 @@ function drawRightMidLeftPanel(visit) {
             drawRightMidLeftPanel.arcs.push(path);
             ++idx;
         }
+        redrawMap();
+        drawRightMidRightPanel();
+        drawRightBotPanel(); /* In case of losing context */
     }
 }
 
