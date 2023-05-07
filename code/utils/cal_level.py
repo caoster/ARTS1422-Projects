@@ -9,10 +9,12 @@ def cal_level(fire_station, fire):
     STATION_STD = 20
     PORTION_ASSIST = 0.33
 
+    start_time = pd.Timestamp(year=2007, month=1, day=1)
     final_time = pd.Timestamp(year=2021, month=1, day=1)
     station_time = {}
     for i in fire_station.values:
         tmp_time = pd.Timestamp(year=int(str(i[4]).split('.')[0]), month=max(int(str(i[4]).split('.')[1]), 1), day=1)
+        tmp_time = max(start_time, tmp_time)
         station_time[i[1]] = (final_time - tmp_time).days
 
     fire_station_name = []
@@ -75,7 +77,7 @@ if __name__ == "__main__":
     fire = pd.read_excel("../../data/fire.xlsx")
     fire_station = pd.read_excel("../../data/fire_station.xlsx")
 
-    fire_value1, station_ability1 = cal_level()
+    fire_value1, station_ability1 = cal_level(fire_station, fire)
     plt.hist(fire_value1, bins=50)
     plt.show()
     plt.hist(station_ability1.values(), bins=10)
