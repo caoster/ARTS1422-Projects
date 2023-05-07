@@ -237,13 +237,13 @@ function drawRightUpPanel() {
     let totalXNumber = 5;
 
     drawRightUpPanel.properties = {
-        'avg_temp': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false, 'clickObj': undefined},
-        'amt_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(47, 69, 84, 1)', 'show': false, 'clickObj': undefined},
-        'num_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(97, 160, 168, 1)', 'show': false, 'clickObj': undefined},
-        'num_snow': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false, 'clickObj': undefined},
-        'num_storm': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false, 'clickObj': undefined},
-        'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false, 'clickObj': undefined},
-        'max_level_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(0, 0, 0, 1)', 'show': false, 'clickObj': undefined},
+        'avg_temp': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(255, 255, 255, 0.6)', 'show': false, 'clickObj': undefined},
+        'amt_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(26, 166, 244, 1)', 'show': false, 'clickObj': undefined},
+        'num_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(250, 255, 0, 1)', 'show': false, 'clickObj': undefined},
+        'num_snow': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(178, 255, 218, 1)', 'show': false, 'clickObj': undefined},
+        'num_storm': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(119, 98, 251, 1)', 'show': false, 'clickObj': undefined},
+        'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false, 'clickObj': undefined},
+        'max_level_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 0.5)', 'show': false, 'clickObj': undefined},
     }
     drawRightUpPanel.property_list = [
         'avg_temp',
@@ -392,7 +392,7 @@ function drawRightUpPanel() {
     function drawPlot() {
         for (const propertyListKey of drawRightUpPanel.property_list) {
             let color = drawRightUpPanel.properties[propertyListKey].color;
-            if (!drawRightUpPanel.properties[propertyListKey].show) color = color.replace(/[^,]+(?=\))/, " 0.1");
+            if (!drawRightUpPanel.properties[propertyListKey].show) color = color.replace(/[^,]+(?=\))/, " 0");
             drawBezier(drawRightUpPanel.points[propertyListKey], color);
         }
     }
@@ -403,7 +403,7 @@ function drawRightUpPanel() {
 
         let idx = 0;
         let position = [[40, 238], [150, 238], [260, 238], [370, 238], [480, 238], [40, 268], [150, 268]];
-        let translate = ['平均气温', '降雨量', '降雨天数', '降雪天数', '暴雨天数', '火灾数量', '最大火灾'];
+        let translate = ['平均气温', '平均降雨', '霜降天数', '降雪天数', '暴雨天数', '火灾数量', '最大火灾'];
         for (const propertyListKey of drawRightUpPanel.property_list) {
             let color = drawRightUpPanel.properties[propertyListKey].color;
             if (!drawRightUpPanel.properties[propertyListKey].show) color = color.replace(/[^,]+(?=\))/, " 0.1");
@@ -630,7 +630,7 @@ function drawRightMidLeftPanel(visit) {
     cBox.appendChild(drawRightMidLeftPanel.canvas);
 
     // if (drawRightMidLeftPanel.selected === undefined) drawRightMidLeftPanel.selected = "";
-    drawRightMidLeftPanel.canvas.addEventListener("click", (event) => {
+    drawRightMidLeftPanel.canvas.addEventListener("mousemove", (event) => {
         let clicked = false;
         for (const arc of drawRightMidLeftPanel.arcs) {
             if (drawRightMidLeftPanel.ctx.isPointInPath(arc, event.offsetX, event.offsetY) && typeSelected.filterType !== arc.reason) {
@@ -646,55 +646,55 @@ function drawRightMidLeftPanel(visit) {
 
     function getColor(reason) {
         let scheme = {
-            '居住场所': 'rgba(192,57,43,0.75)',
-            '其他': 'rgba(212,172,13,0.75)',
-            '垃圾堆': 'rgba(0,102,102,0.75)',
-            '轿车': 'rgba(106,27,154,0.75)',
-            '餐饮场所': 'rgba(173,20,87,0.75)',
-            '学校': 'rgba(40,53,147,0.75)',
-            '商业场所': 'rgba(0,137,123,0.75)',
-            '工地': 'rgba(216,67,21,0.75)',
-            '货车': 'rgba(126,87,194,0.75)',
-            '办公场所': 'rgba(175,180,43,0.75)',
-            '露天堆垛': 'rgba(244,81,30,0.75)',
-            '公园': 'rgba(84,110,122,0.75)',
-            '厂房': 'rgba(161,136,127,0.75)',
-            '物资仓储': 'rgba(77,182,172,0.75)',
-            '宾馆': 'rgba(156,39,176,0.75)',
-            '室外设备': 'rgba(255,112,67,0.75)',
-            '绿化带': 'rgba(102,187,106,0.75)',
-            '交通枢纽': 'rgba(94,53,177,0.75)',
-            '客车': 'rgba(236,64,122,0.75)',
-            '垃圾箱': 'rgba(255,128,171,0.75)',
-            '电动车': 'rgba(41,182,246,0.75)',
-            '露天场所': 'rgba(156,204,101,0.75)',
-            '汽车库': 'rgba(255,183,77,0.75)',
-            '娱乐场所': 'rgba(186,104,200,0.75)',
-            '医疗机构': 'rgba(120,144,156,0.75)',
-            '室外市场': 'rgba(161,136,127,0.75)',
-            '通信场所': 'rgba(124,179,66,0.75)',
-            '特种车': 'rgba(141,110,99,0.75)',
-            '宗教场所': 'rgba(144,164,174,0.75)',
-            '石油化工': 'rgba(142,36,170,0.75)',
-            '科研试验': 'rgba(158,157,36,0.75)',
-            '体育场馆': 'rgba(140,158,255,0.75)',
-            '轨道交通': 'rgba(67,160,71,0.75)',
-            '室内农副': 'rgba(126,87,194,0.75)',
-            '修车库': 'rgba(171,71,188,0.75)',
-            '船舶': 'rgba(255,112,67,0.75)',
-            '加油站': 'rgba(92,107,192,0.75)',
-            '会展中心': 'rgba(38,166,154,0.75)',
-            '文物古建筑': 'rgba(239,108,0,0.75)',
-            '文博馆': 'rgba(206,147,216,0.75)',
-            '垃圾场': 'rgba(255,204,128,0.75)',
-            '摩托车': 'rgba(197,225,165,0.75)',
-            '废品回收': 'rgba(255,171,145,0.75)',
-            '森林': 'rgba(128,203,196,0.75)',
-            '金融交易': 'rgba(159,168,218,0.75)',
-            '养老院': 'rgba(188,170,164,0.75)',
+            '居住场所': 'rgba(192,57,43,0.3)',
+            '其他': 'rgba(212,172,13,0.3)',
+            '垃圾堆': 'rgba(0,102,102,0.3)',
+            '轿车': 'rgba(106,27,154,0.3)',
+            '餐饮场所': 'rgba(173,20,87,0.3)',
+            '学校': 'rgba(40,53,147,0.3)',
+            '商业场所': 'rgba(0,137,123,0.3)',
+            '工地': 'rgba(216,67,21,0.3)',
+            '货车': 'rgba(126,87,194,0.3)',
+            '办公场所': 'rgba(175,180,43,0.3)',
+            '露天堆垛': 'rgba(244,81,30,0.3)',
+            '公园': 'rgba(84,110,122,0.3)',
+            '厂房': 'rgba(161,136,127,0.3)',
+            '物资仓储': 'rgba(77,182,172,0.3)',
+            '宾馆': 'rgba(156,39,176,0.3)',
+            '室外设备': 'rgba(255,112,67,0.3)',
+            '绿化带': 'rgba(102,187,106,0.3)',
+            '交通枢纽': 'rgba(94,53,177,0.3)',
+            '客车': 'rgba(236,64,122,0.3)',
+            '垃圾箱': 'rgba(255,128,171,0.3)',
+            '电动车': 'rgba(41,182,246,0.3)',
+            '露天场所': 'rgba(156,204,101,0.3)',
+            '汽车库': 'rgba(255,183,77,0.3)',
+            '娱乐场所': 'rgba(186,104,200,0.3)',
+            '医疗机构': 'rgba(120,144,156,0.3)',
+            '室外市场': 'rgba(161,136,127,0.3)',
+            '通信场所': 'rgba(124,179,66,0.3)',
+            '特种车': 'rgba(141,110,99,0.3)',
+            '宗教场所': 'rgba(144,164,174,0.3)',
+            '石油化工': 'rgba(142,36,170,0.3)',
+            '科研试验': 'rgba(158,157,36,0.3)',
+            '体育场馆': 'rgba(140,158,255,0.3)',
+            '轨道交通': 'rgba(67,160,71,0.3)',
+            '室内农副': 'rgba(126,87,194,0.3)',
+            '修车库': 'rgba(171,71,188,0.3)',
+            '船舶': 'rgba(255,112,67,0.3)',
+            '加油站': 'rgba(92,107,192,0.3)',
+            '会展中心': 'rgba(38,166,154,0.3)',
+            '文物古建筑': 'rgba(239,108,0,0.3)',
+            '文博馆': 'rgba(206,147,216,0.3)',
+            '垃圾场': 'rgba(255,204,128,0.3)',
+            '摩托车': 'rgba(197,225,165,0.3)',
+            '废品回收': 'rgba(255,171,145,0.3)',
+            '森林': 'rgba(128,203,196,0.3)',
+            '金融交易': 'rgba(159,168,218,0.3)',
+            '养老院': 'rgba(188,170,164,0.3)',
         }
 
-        let else_color = 'rgba(177,89,40,0.75)';
+        let else_color = 'rgba(177,89,40,0.3)';
         if (scheme[reason] === undefined) return else_color;
         return scheme[reason];
     }
@@ -851,7 +851,9 @@ function drawRightBotPanel() {
     let points = [{
         type: 'parcoords',
         line: {
-            color: data.map(row => row['level']),
+            cmin: 0,
+            cmax: 100,
+            color: filtered_station.map(row => row['level']),
             colorscale: [
                 [0.0, 'rgba(5,10,172,0.75)'],
                 [0.35, 'rgba(106,137,247,0.75)'],
@@ -862,7 +864,10 @@ function drawRightBotPanel() {
             ]
         },
 
-        dimensions: [{
+        dimensions: [ {
+            label: '\u7b49\u7ea7', // 等级
+            values: filtered_station.map(row => row['level'])
+        }, {
             label: '\u6295\u7528\u5e74\u6708', // 投用年月
             values: filtered_station.map(row => (row['time'].getTime())),
             ticktext: ticks.map((t) => {
