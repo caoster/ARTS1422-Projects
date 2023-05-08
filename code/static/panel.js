@@ -797,7 +797,7 @@ function drawRightMidRightPanel() {
 
         dimensions: [{
             range: [0, 100],
-            label: '\u706b\u60c5\uff08\u961f\uff09', // 火情（队）
+            label: '\u5371\u5bb3\u6027', // 危害性
             values: data.filter(typeSelected).map(row => row['level']),
         }, {
             range: [0, 18000],
@@ -843,8 +843,8 @@ function drawRightMidRightPanel() {
 
 function drawRightBotPanel() {
     let data = fire.filter(inTimePeriod);
-    let filtered_station = fire_station.filter(beforeEndTime);
-    for (const filteredStationElement of filtered_station) {
+    drawRightBotPanel.filtered_station = fire_station.filter(beforeEndTime);
+    for (const filteredStationElement of drawRightBotPanel.filtered_station) {
         filteredStationElement["count"] = 0;
         filteredStationElement["popu"] = 0;
         filteredStationElement["indu"] = 0;
@@ -852,7 +852,7 @@ function drawRightBotPanel() {
 
     for (const datum of data) {
         for (const fighter of datum["fighters"]) {
-            for (const filteredStationElement of filtered_station) {
+            for (const filteredStationElement of drawRightBotPanel.filtered_station) {
                 if (filteredStationElement["station_code"] === fighter) {
                     filteredStationElement["count"] += 1;
                     filteredStationElement["popu"] = Math.max(datum["popu"], filteredStationElement["popu"]);
@@ -868,14 +868,14 @@ function drawRightBotPanel() {
         return Array.from({length: 5}, (_, i) => start + step * i);
     }
 
-    let ticks = linspace(Math.min(...filtered_station.map(row => (row['time'].getTime()))), Math.max(...filtered_station.map(row => (row['time'].getTime()))));
+    let ticks = linspace(Math.min(...drawRightBotPanel.filtered_station.map(row => (row['time'].getTime()))), Math.max(...drawRightBotPanel.filtered_station.map(row => (row['time'].getTime()))));
 
     let points = [{
         type: 'parcoords',
         line: {
             cmin: 0,
             cmax: 100,
-            color: filtered_station.map(row => row['level']),
+            color: drawRightBotPanel.filtered_station.map(row => row['level']),
             colorscale: [
                 [0.0, 'rgba(5,10,172,0.75)'],
                 [0.35, 'rgba(106,137,247,0.75)'],
@@ -894,10 +894,10 @@ function drawRightBotPanel() {
 
         dimensions: [{
             label: '\u7b49\u7ea7', // 等级
-            values: filtered_station.map(row => row['level'])
+            values: drawRightBotPanel.filtered_station.map(row => row['level'])
         }, {
             label: '\u6295\u7528\u5e74\u6708', // 投用年月
-            values: filtered_station.map(row => (row['time'].getTime())),
+            values: drawRightBotPanel.filtered_station.map(row => (row['time'].getTime())),
             ticktext: ticks.map((t) => {
                 let time = new Date(t);
                 return time.getFullYear() + "-" + Math.max(1, time.getMonth());
@@ -905,16 +905,16 @@ function drawRightBotPanel() {
             tickvals: ticks.map((t) => new Date(t)),
         }, {
             label: '\u51fa\u8b66\u9891\u7387\uff08\u6b21\u002f\u5929\uff09', // 出警频率（次/天）
-            values: filtered_station.map(row => {
+            values: drawRightBotPanel.filtered_station.map(row => {
                 if (begin < row["time"]) return row['count'] / ((end - row["time"]) / 1000 / 3600 / 24)
                 else return row['count'] / ((end - begin) / 1000 / 3600 / 24)
             })
         }, {
             label: '\u4eba\u53e3\u5bc6\u5ea6', // 人口密度
-            values: filtered_station.map(row => row['popu'])
+            values: drawRightBotPanel.filtered_station.map(row => row['popu'])
         }, {
             label: '\u4f01\u4e1a\u5bc6\u5ea6', // 企业密度
-            values: filtered_station.map(row => row['indu'])
+            values: drawRightBotPanel.filtered_station.map(row => row['indu'])
         }]
     }];
 
@@ -936,5 +936,18 @@ function drawRightBotPanel() {
         },
     };
 
-    Plotly.newPlot('right-bot-panel', points, layout, {displayModeBar: false});
+    drawRightBotPanel.graph = document.getElementById('right-bot-panel');
+    drawRightBotPanel.constraintranges = [undefined, undefined, undefined, undefined, undefined];
+
+    Plotly.newPlot(drawRightBotPanel.graph, points, layout, {displayModeBar: false});
+    drawRightBotPanel.graph.on('plotly_restyle', function (data) {
+        drawRightBotPanel.constraintranges = [
+            drawRightBotPanel.graph._fullData[0].dimensions[0].constraintrange,
+            drawRightBotPanel.graph._fullData[0].dimensions[1].constraintrange,
+            drawRightBotPanel.graph._fullData[0].dimensions[2].constraintrange,
+            drawRightBotPanel.graph._fullData[0].dimensions[3].constraintrange,
+            drawRightBotPanel.graph._fullData[0].dimensions[4].constraintrange
+        ]
+        display_fire_station();
+    });
 }

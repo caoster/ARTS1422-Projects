@@ -155,7 +155,7 @@
 
     map.on('complete', function () {
         map.plugin(["AMap.OverView", "AMap.Scale"], function () {
-            map.addControl(new AMap.OverView({isOpen: true}));
+            map.addControl(new AMap.OverView({isOpen: false}));
             map.addControl(new AMap.Scale);
         });
         console.log("Complete!");
@@ -234,6 +234,39 @@
         return true;
     }
 
+    function stationSelectedByParcoords(obj) {
+        if (drawRightBotPanel.constraintranges === undefined) return true;
+        if (drawRightBotPanel.constraintranges[0] !== undefined) {
+            if (drawRightBotPanel.constraintranges[0][0] > obj["level"] || obj["level"] > drawRightBotPanel.constraintranges[0][1]) {
+                return false;
+            }
+        }
+        if (drawRightBotPanel.constraintranges[1] !== undefined) {
+            if (drawRightBotPanel.constraintranges[1][0] > obj["time"] || obj["time"] > drawRightBotPanel.constraintranges[1][1]) {
+                return false;
+            }
+        }
+        // if (drawRightBotPanel.constraintranges[2] !== undefined) {
+        //     let data;
+        //     if (begin < row["time"]) data = row['count'] / ((end - row["time"]) / 1000 / 3600 / 24)
+        //     else return row['count'] / ((end - begin) / 1000 / 3600 / 24)
+        //     if (drawRightBotPanel.constraintranges[2][0] > obj["indu"] || obj["indu"] > drawRightBotPanel.constraintranges[2][1]) {
+        //         return false;
+        //     }
+        // }
+        // if (drawRightBotPanel.constraintranges[1] !== undefined) {
+        //     if (drawRightBotPanel.constraintranges[1][0] > obj["time"] || obj["time"] > drawRightBotPanel.constraintranges[1][1]) {
+        //         return false;
+        //     }
+        // }
+        // if (drawRightBotPanel.constraintranges[1] !== undefined) {
+        //     if (drawRightBotPanel.constraintranges[1][0] > obj["time"] || obj["time"] > drawRightBotPanel.constraintranges[1][1]) {
+        //         return false;
+        //     }
+        // }
+        return true;
+    }
+
     function initComplete(file) {
         if (initComplete.info === undefined) {
             initComplete.info = {
@@ -309,7 +342,7 @@
     function display_fire_station() {
         let display_fire_station_list = [];
         for (const fireStationElement of fire_station) {
-            if (beforeEndTime(fireStationElement)) {
+            if (beforeEndTime(fireStationElement) && stationSelectedByParcoords(fireStationElement)) {
                 display_fire_station_list.push(fireStationElement);
             }
         }

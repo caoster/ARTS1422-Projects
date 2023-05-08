@@ -132,11 +132,6 @@ def fire_js():
 
 @app.route("/")
 def webpage():
-    return render_template("main.html")
-
-
-@app.route("/amap")
-def amap():
     return render_template("amap.html")
 
 
