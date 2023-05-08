@@ -621,7 +621,7 @@ function drawRightUpPanel() {
     }
 }
 
-function drawRightMidLeftPanel() {
+function drawRightMidLeftPanel(NoDrawRight = false) {
     if (drawRightMidLeftPanel.canvas === undefined) {
         drawRightMidLeftPanel.canvas = document.createElement("canvas");
         drawRightMidLeftPanel.canvas.width = 300;
@@ -700,9 +700,9 @@ function drawRightMidLeftPanel() {
         return scheme[reason];
     }
 
-    redraw();
+    redraw(NoDrawRight);
 
-    function redraw() {
+    function redraw(NoDrawRight) {
         drawRightMidLeftPanel.ctx.clearRect(0, 0, drawRightMidLeftPanel.canvas.width, drawRightMidLeftPanel.canvas.height);
 
         let count_reason = {}
@@ -766,7 +766,7 @@ function drawRightMidLeftPanel() {
         drawRightMidLeftPanel.ctx.fillText(displayText[3], displayText[0], displayText[1] + 15);
         drawRightMidLeftPanel.ctx.textAlign = "left";
         redrawMap();
-        drawRightMidRightPanel();
+        if (!NoDrawRight) drawRightMidRightPanel();
         drawRightBotPanel(); /* In case of losing context */
     }
 }
@@ -831,13 +831,14 @@ function drawRightMidRightPanel() {
 
     Plotly.newPlot(drawRightMidRightPanel.graph, points, layout, {displayModeBar: false});
     drawRightMidRightPanel.graph.on('plotly_restyle', function (data) {
-            drawRightMidRightPanel.constraintranges = [
-                drawRightMidRightPanel.graph._fullData[0].dimensions[0].constraintrange,
-                drawRightMidRightPanel.graph._fullData[0].dimensions[1].constraintrange,
-                drawRightMidRightPanel.graph._fullData[0].dimensions[2].constraintrange
-            ]
-
-        });
+        drawRightMidRightPanel.constraintranges = [
+            drawRightMidRightPanel.graph._fullData[0].dimensions[0].constraintrange,
+            drawRightMidRightPanel.graph._fullData[0].dimensions[1].constraintrange,
+            drawRightMidRightPanel.graph._fullData[0].dimensions[2].constraintrange
+        ]
+        display_fire();
+        drawRightMidLeftPanel(true);
+    });
 }
 
 function drawRightBotPanel() {
