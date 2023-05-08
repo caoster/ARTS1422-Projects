@@ -254,16 +254,16 @@
         //         return false;
         //     }
         // }
-        // if (drawRightBotPanel.constraintranges[1] !== undefined) {
-        //     if (drawRightBotPanel.constraintranges[1][0] > obj["time"] || obj["time"] > drawRightBotPanel.constraintranges[1][1]) {
-        //         return false;
-        //     }
-        // }
-        // if (drawRightBotPanel.constraintranges[1] !== undefined) {
-        //     if (drawRightBotPanel.constraintranges[1][0] > obj["time"] || obj["time"] > drawRightBotPanel.constraintranges[1][1]) {
-        //         return false;
-        //     }
-        // }
+        if (drawRightBotPanel.constraintranges[3] !== undefined) {
+            if (drawRightBotPanel.constraintranges[3][0] > obj["popu"] || obj["popu"] > drawRightBotPanel.constraintranges[3][1]) {
+                return false;
+            }
+        }
+        if (drawRightBotPanel.constraintranges[1] !== undefined) {
+            if (drawRightBotPanel.constraintranges[4][0] > obj["indu"] || obj["indu"] > drawRightBotPanel.constraintranges[4][1]) {
+                return false;
+            }
+        }
         return true;
     }
 
