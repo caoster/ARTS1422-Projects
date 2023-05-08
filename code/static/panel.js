@@ -45,7 +45,7 @@ function drawLeftPanel() {
             "fire_station": true,
             "show_area": false,
             "minute": 5,
-            "population": true,
+            "population": false,
             "enterprise": false,
             "select": false
         };
@@ -245,7 +245,7 @@ function drawRightUpPanel() {
         'num_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(250, 255, 0, 1)', 'show': false, 'clickObj': undefined},
         'num_snow': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(178, 255, 218, 1)', 'show': false, 'clickObj': undefined},
         'num_storm': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(119, 98, 251, 1)', 'show': false, 'clickObj': undefined},
-        'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false, 'clickObj': undefined},
+        'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': true, 'clickObj': undefined},
         'max_level_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 0.5)', 'show': false, 'clickObj': undefined},
     }
     drawRightUpPanel.property_list = [
@@ -630,7 +630,6 @@ function drawRightMidLeftPanel() {
         let cBox = document.getElementById("right-mid-left-panel");
         cBox.appendChild(drawRightMidLeftPanel.canvas);
 
-        // if (drawRightMidLeftPanel.selected === undefined) drawRightMidLeftPanel.selected = "";
         drawRightMidLeftPanel.canvas.addEventListener("mousemove", (event) => {
             let clicked = false;
             for (const arc of drawRightMidLeftPanel.arcs) {
@@ -725,7 +724,7 @@ function drawRightMidLeftPanel() {
         drawRightMidLeftPanel.ctx.font = "18px Verdana";
         drawRightMidLeftPanel.arcs = [];
 
-        let displayText = [0, 0, ""];
+        let displayText = [0, 0, "", ""];
 
         for (let reason of count_reason) {
             let portionAngle = (reason[1] / sum) * 2 * Math.PI;
@@ -737,6 +736,7 @@ function drawRightMidLeftPanel() {
                 displayText = [
                     125 + Math.cos(currentAngle + portionAngle / 2) * 50,
                     100 + Math.sin(currentAngle + portionAngle / 2) * 50,
+                    reason[0],
                     String(Math.trunc(reason[1] / sum * 1000) / 10) + "%"
                 ];
             } else if (typeSelected.filterType === "") {
@@ -762,7 +762,8 @@ function drawRightMidLeftPanel() {
         drawRightMidLeftPanel.ctx.font = "22px Verdana";
         drawRightMidLeftPanel.ctx.fillStyle = "black";
         drawRightMidLeftPanel.ctx.textAlign = "center";
-        drawRightMidLeftPanel.ctx.fillText(displayText[2], displayText[0], displayText[1]);
+        drawRightMidLeftPanel.ctx.fillText(displayText[2], displayText[0], displayText[1] - 5);
+        drawRightMidLeftPanel.ctx.fillText(displayText[3], displayText[0], displayText[1] + 15);
         drawRightMidLeftPanel.ctx.textAlign = "left";
         redrawMap();
         drawRightMidRightPanel();

@@ -25,25 +25,21 @@
         .myinfowindow {
             width: 240px;
             min-height: 50px;
+            max-height: 150px;
         }
 
-        .myinfowindow h5 {
-            height: 20px;
-            line-height: 20px;
-            overflow: hidden;
-            font-size: 14px;
+        .myinfowindow h2 {
+            /*height: 20px;*/
+            font-size: 18px;
             font-weight: bold;
             width: 220px;
-            text-overflow: ellipsis;
-            word-break: break-all;
-            white-space: nowrap;
         }
 
         .myinfowindow div {
-            margin-top: 10px;
+            /*margin-top: 10px;*/
             min-height: 40px;
             line-height: 20px;
-            font-size: 13px;
+            font-size: 16px;
             color: #6f6f6f;
         }
 
@@ -114,8 +110,9 @@
         if (!infoWindow) {
             infoWindow = new AMap.InfoWindow({autoMove: true, isCustom: false});
         }
-        let extData = e.target.getExtData();
-        infoWindow.setContent("<div class='myinfowindow'><h5>" + extData.name + "</h5><div>" + extData.desc + "</div></div>");
+        let extData = e.rawData;
+        let content = `火灾等级：${Math.trunc(extData.level * 10) / 10}<br>人口密度：${Math.trunc(extData.popu * 10) / 10}<br>气温：${extData.temp}`
+        infoWindow.setContent(`<div class='myinfowindow'><h2>${String(extData.id)} ${extData.type}</h2><div>${content}<div></div>`);
         infoWindow.open(map, e.lnglat);
     }
 
@@ -148,10 +145,7 @@
             strokeOpacity: 0.2,
             fillColor: '#1791fc',
             fillOpacity: 0.4,
-            // 线样式还支持 'dashed'
             strokeStyle: "solid",
-            // strokeStyle是dashed时有效
-            // strokeDasharray: [30,10],
         })
     }
 
@@ -257,6 +251,8 @@
         eventSupport: true,
         zIndex: 300
     });
+
+    fireLayer.on("click", mapFeatureClick);
 
     function display_fire() {
         let display_fire_list = fire.filter(inTimePeriod);
