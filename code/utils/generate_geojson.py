@@ -1,9 +1,27 @@
 import json
 import numpy as np
+import math
 
 population_density = np.load("../../data/population_density.npy")
 regional_industry = np.load("../../data/regional_industry.npy")
 weather = np.load("../../data/weather.npy")
+
+min_density = math.inf
+max_density = -math.inf
+population_density_dict_by_month = []
+for each_month_population in population_density:
+    population_density_dict_by_month.append({})
+    for lat, lon, density in each_month_population:
+        population_density_dict_by_month[-1][(lon, lat)] = density
+        min_density = min(min_density, density)
+        max_density = max(max_density, density)
+
+print(f"min_density: {min_density}")
+print(f"max_density: {max_density}")
+
+def find_density(month, lon, lat):
+    return population_density_dict_by_month[month][(lon, lat)]
+
 
 latitude = {}
 longitude = {}
@@ -36,11 +54,12 @@ def add_data_point(position: tuple[float, float]):
     lon, lat = position
     geojson['features'].append({
         'type': 'Feature',
-        'properties': {'name': 'A 3x3 Square'},
+        'properties': {'name': 'A 3x3 Square', 'population_density': {}},
         'geometry': {'type': 'Polygon', 'coordinates': [
             [[lon, lat], [lon + 0.027, lat], [lon + 0.027, lat + 0.027], [lon, lat + 0.027], [lon, lat]]
         ]}
     })
+    geojson['features'][-1]['properties']['population_density'] = {month: find_density(month, lon, lat) for month in range(168)}
 
 
 for i in all_pos:
