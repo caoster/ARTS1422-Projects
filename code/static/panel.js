@@ -630,7 +630,7 @@ function drawRightMidLeftPanel() {
         let cBox = document.getElementById("right-mid-left-panel");
         cBox.appendChild(drawRightMidLeftPanel.canvas);
 
-        drawRightMidLeftPanel.canvas.addEventListener("mousemove", (event) => {
+        drawRightMidLeftPanel.canvas.addEventListener("click", (event) => {
             let clicked = false;
             for (const arc of drawRightMidLeftPanel.arcs) {
                 if (drawRightMidLeftPanel.ctx.isPointInPath(arc, event.offsetX, event.offsetY) && typeSelected.filterType !== arc.reason) {
@@ -760,7 +760,7 @@ function drawRightMidLeftPanel() {
             ++idx;
         }
         drawRightMidLeftPanel.ctx.font = "22px Verdana";
-        drawRightMidLeftPanel.ctx.fillStyle = "black";
+        drawRightMidLeftPanel.ctx.fillStyle = "white";
         drawRightMidLeftPanel.ctx.textAlign = "center";
         drawRightMidLeftPanel.ctx.fillText(displayText[2], displayText[0], displayText[1] - 5);
         drawRightMidLeftPanel.ctx.fillText(displayText[3], displayText[0], displayText[1] + 15);
@@ -798,16 +798,20 @@ function drawRightMidRightPanel() {
         dimensions: [{
             range: [0, 100],
             label: '\u706b\u60c5\uff08\u961f\uff09', // 火情（队）
-            values: data.filter(typeSelected).map(row => row['level'])
+            values: data.filter(typeSelected).map(row => row['level']),
         }, {
+            range: [0, 18000],
             label: '\u4eba\u53e3\u5bc6\u5ea6', // 人口密度
             values: data.filter(typeSelected).map(row => row['popu'])
         }, {
+            range: [0, 18000],
             label: '\u4f01\u4e1a\u5bc6\u5ea6', // 企业密度
             values: data.filter(typeSelected).map(row => row['indu'])
         }]
     }];
 
+    drawRightMidRightPanel.graph = document.getElementById('right-mid-right-panel');
+    drawRightMidRightPanel.constraintranges = [undefined, undefined, undefined];
     let layout = {
         height: 300,
         plot_bgcolor: "rgba(0, 0, 0, 0)",
@@ -825,7 +829,15 @@ function drawRightMidRightPanel() {
         },
     };
 
-    Plotly.newPlot('right-mid-right-panel', points, layout, {displayModeBar: false});
+    Plotly.newPlot(drawRightMidRightPanel.graph, points, layout, {displayModeBar: false});
+    drawRightMidRightPanel.graph.on('plotly_restyle', function (data) {
+            drawRightMidRightPanel.constraintranges = [
+                drawRightMidRightPanel.graph._fullData[0].dimensions[0].constraintrange,
+                drawRightMidRightPanel.graph._fullData[0].dimensions[1].constraintrange,
+                drawRightMidRightPanel.graph._fullData[0].dimensions[2].constraintrange
+            ]
+
+        });
 }
 
 function drawRightBotPanel() {

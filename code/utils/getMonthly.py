@@ -45,5 +45,5 @@ def getMonthly(fire, fire_value):
             for i in all_data:
                 if i['year'] == event[1].year and i['month'] == event[1].month:
                     i['num_fire'] += 1
-                    i['max_level_fire'] = max(i['max_level_fire'], fire_value[event['fire_code']])
+                    i['max_level_fire'] = max(i['max_level_fire'], round(fire_value[event['fire_code']], 1))
     return all_data

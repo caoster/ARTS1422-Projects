@@ -215,6 +215,26 @@
         return false;
     }
 
+    function fireSelectedByParcoords(obj) {
+        if (drawRightMidRightPanel.constraintranges === undefined) return true;
+        if (drawRightMidRightPanel.constraintranges[0] !== undefined) {
+            if (drawRightMidRightPanel.constraintranges[0][0] > obj["level"] || obj["level"] > drawRightMidRightPanel.constraintranges[0][1]) {
+                return false;
+            }
+        }
+        if (drawRightMidRightPanel.constraintranges[1] !== undefined) {
+            if (drawRightMidRightPanel.constraintranges[1][0] > obj["popu"] || obj["popu"] > drawRightMidRightPanel.constraintranges[1][1]) {
+                return false;
+            }
+        }
+        if (drawRightMidRightPanel.constraintranges[2] !== undefined) {
+            if (drawRightMidRightPanel.constraintranges[2][0] > obj["indu"] || obj["indu"] > drawRightMidRightPanel.constraintranges[2][1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function initComplete(file) {
         if (initComplete.info === undefined) {
             initComplete.info = {
@@ -252,10 +272,10 @@
         zIndex: 300
     });
 
-    fireLayer.on("click", mapFeatureClick);
+    fireLayer.on("mouseover", mapFeatureClick);
 
     function display_fire() {
-        let display_fire_list = fire.filter(inTimePeriod);
+        let display_fire_list = fire.filter(inTimePeriod).filter(fireSelectedByParcoords);
         fireLayer.setData(display_fire_list, {lnglat: 'lnglat'});
         fireLayer.setOptions({
             unit: 'meter',
