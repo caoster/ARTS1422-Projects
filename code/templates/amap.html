@@ -131,7 +131,34 @@
             resizeEnable: true,
             zooms: [11, 14]
         });
-    //    new AMap.TileLayer.RoadNet({map: map, zIndex: 2});
+
+    let mouseTool = new AMap.MouseTool(map);
+    let overlays = [];
+    mouseTool.on('draw', function (e) {
+        e.obj.setMap(map);
+        overlays.push(e.obj);
+        drawRightMidLeftPanel();
+        drawRightMidRightPanel();
+    })
+
+    function drawPolygon() {
+        mouseTool.polygon({
+            strokeColor: "#FF33FF",
+            strokeWeight: 6,
+            strokeOpacity: 0.2,
+            fillColor: '#1791fc',
+            fillOpacity: 0.4,
+            // 线样式还支持 'dashed'
+            strokeStyle: "solid",
+            // strokeStyle是dashed时有效
+            // strokeDasharray: [30,10],
+        })
+    }
+
+    function removePolygon() {
+        mouseTool.close(true);
+        overlays = [];
+    }
 
     map.on('complete', function () {
         map.plugin(["AMap.OverView", "AMap.Scale"], function () {
@@ -186,11 +213,12 @@
 
     typeSelected.filterType = "";
 
-    function typeNotSelected(obj) {
-        if (typeSelected.filterType === "")
-            return false;
-        else
-            return obj['type'] !== typeSelected.filterType
+    function fireSelected(obj) {
+        if (overlays.length === 0) return true;
+        for (const overlay of overlays) {
+            if (overlay.contains(obj.lnglat)) return true;
+        }
+        return false;
     }
 
     function initComplete(file) {
@@ -382,7 +410,7 @@
 </script>
 <!-- Monthly statistics -->
 <script>
-    loadScript("/static/monthly.js", function () {
+    loadScript("/data/monthly.js", function () {
         initComplete("monthly");
     })
 </script>

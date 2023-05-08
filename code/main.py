@@ -6,6 +6,7 @@ import requests
 import datetime
 
 from utils.cal_level import cal_level
+from utils.getMonthly import getMonthly
 
 app = Flask(__name__)
 
@@ -13,6 +14,8 @@ grid_json_data = json.load(open("data/geojson.json", "r"))  # This will automati
 fire = pd.read_excel("../data/fire.xlsx")
 fire_station = pd.read_excel("../data/fire_station.xlsx")
 fire_value, station_ability = cal_level(fire_station, fire)
+monthly = getMonthly(fire, fire_value)
+monthly = str(monthly)
 temperature = {}
 with open("data/weather.csv") as csv:
     csv = csv.readlines()
@@ -72,10 +75,6 @@ population_enterprise: str
 with open("static/population_enterprise.js", "r") as file:
     population_enterprise = file.read()
 
-monthly: str
-with open("static/monthly.js", "r") as file:
-    monthly = file.read()
-
 with open("token.secret") as token:
     TOKEN = token.read()
 
@@ -113,7 +112,7 @@ def population_enterprise_js():
 
 @app.route("/data/monthly.js")
 def monthly_js():
-    return monthly
+    return "let monthly = " + monthly + ";"
 
 
 @app.route("/data/fire_station.js")

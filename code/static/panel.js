@@ -78,6 +78,9 @@ function drawLeftPanel() {
         drawLeftPanel.settings.enterprise ? enterpriseLayer.show() : enterpriseLayer.hide();
         display_duration();
         drawLeftPanel.settings.show_area ? durationLayer.show() : durationLayer.hide();
+        drawLeftPanel.settings.select ? drawPolygon() : removePolygon();
+        drawRightMidLeftPanel();
+        drawRightMidRightPanel();
     }
 
     /* Background */
@@ -237,13 +240,13 @@ function drawRightUpPanel() {
     let totalXNumber = 5;
 
     drawRightUpPanel.properties = {
-        'avg_temp': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(255, 255, 255, 0.6)', 'show': false, 'clickObj': undefined },
-        'amt_rain': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(26, 166, 244, 1)', 'show': false, 'clickObj': undefined },
-        'num_rain': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(250, 255, 0, 1)', 'show': false, 'clickObj': undefined },
-        'num_snow': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(178, 255, 218, 1)', 'show': false, 'clickObj': undefined },
-        'num_storm': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(119, 98, 251, 1)', 'show': false, 'clickObj': undefined },
-        'num_fire': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false, 'clickObj': undefined },
-        'max_level_fire': { 'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 0.5)', 'show': false, 'clickObj': undefined },
+        'avg_temp': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(255, 255, 255, 0.6)', 'show': false, 'clickObj': undefined},
+        'amt_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(26, 166, 244, 1)', 'show': false, 'clickObj': undefined},
+        'num_rain': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(250, 255, 0, 1)', 'show': false, 'clickObj': undefined},
+        'num_snow': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(178, 255, 218, 1)', 'show': false, 'clickObj': undefined},
+        'num_storm': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(119, 98, 251, 1)', 'show': false, 'clickObj': undefined},
+        'num_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 1)', 'show': false, 'clickObj': undefined},
+        'max_level_fire': {'rng_min': Number.POSITIVE_INFINITY, 'rng_max': Number.NEGATIVE_INFINITY, 'color': 'rgba(251, 61, 95, 0.5)', 'show': false, 'clickObj': undefined},
     }
     drawRightUpPanel.property_list = [
         'avg_temp',
@@ -300,17 +303,16 @@ function drawRightUpPanel() {
         for (let i = 0; i < monthly.length; i++) {
             let x = originX + (bWidth + bMargin) * i + bMargin + bWidth / 2;
 
-            points.avg_temp.push({ x: x, y: originY - cHeight * (monthly[i].avg_temp - prop.avg_temp.rng_min) / (prop.avg_temp.rng_max - prop.avg_temp.rng_min) });
-            points.amt_rain.push({ x: x, y: originY - cHeight * (monthly[i].amt_rain - prop.amt_rain.rng_min) / (prop.amt_rain.rng_max - prop.amt_rain.rng_min) });
-            points.num_rain.push({ x: x, y: originY - cHeight * (monthly[i].num_rain - prop.num_rain.rng_min) / (prop.num_rain.rng_max - prop.num_rain.rng_min) });
-            points.num_snow.push({ x: x, y: originY - cHeight * (monthly[i].num_snow - prop.num_snow.rng_min) / (prop.num_snow.rng_max - prop.num_snow.rng_min) });
-            points.num_storm.push({ x: x, y: originY - cHeight * (monthly[i].num_storm - prop.num_storm.rng_min) / (prop.num_storm.rng_max - prop.num_storm.rng_min) });
-            points.num_fire.push({ x: x, y: originY - cHeight * (monthly[i].num_fire - prop.num_fire.rng_min) / (prop.num_fire.rng_max - prop.num_fire.rng_min) });
-            points.max_level_fire.push({ x: x, y: originY - cHeight * (monthly[i].max_level_fire - prop.max_level_fire.rng_min) / (prop.max_level_fire.rng_max - prop.max_level_fire.rng_min) });
+            points.avg_temp.push({x: x, y: originY - cHeight * (monthly[i].avg_temp - prop.avg_temp.rng_min) / (prop.avg_temp.rng_max - prop.avg_temp.rng_min)});
+            points.amt_rain.push({x: x, y: originY - cHeight * (monthly[i].amt_rain - prop.amt_rain.rng_min) / (prop.amt_rain.rng_max - prop.amt_rain.rng_min)});
+            points.num_rain.push({x: x, y: originY - cHeight * (monthly[i].num_rain - prop.num_rain.rng_min) / (prop.num_rain.rng_max - prop.num_rain.rng_min)});
+            points.num_snow.push({x: x, y: originY - cHeight * (monthly[i].num_snow - prop.num_snow.rng_min) / (prop.num_snow.rng_max - prop.num_snow.rng_min)});
+            points.num_storm.push({x: x, y: originY - cHeight * (monthly[i].num_storm - prop.num_storm.rng_min) / (prop.num_storm.rng_max - prop.num_storm.rng_min)});
+            points.num_fire.push({x: x, y: originY - cHeight * (monthly[i].num_fire - prop.num_fire.rng_min) / (prop.num_fire.rng_max - prop.num_fire.rng_min)});
+            points.max_level_fire.push({x: x, y: originY - cHeight * (monthly[i].max_level_fire - prop.max_level_fire.rng_min) / (prop.max_level_fire.rng_max - prop.max_level_fire.rng_min)});
         }
         drawBody();
     }
-
 
     function drawTime() {
         let radius = 15;
@@ -464,8 +466,8 @@ function drawRightUpPanel() {
         }
 
         return {
-            pA: { x: pAx, y: pAy },
-            pB: { x: pBx, y: pBy }
+            pA: {x: pAx, y: pAy},
+            pB: {x: pBx, y: pBy}
         }
     }
 
@@ -611,7 +613,7 @@ function drawRightUpPanel() {
             document.onmouseup = null;
             drawRightUpPanel.modifyCtrl1 = false;
             drawRightUpPanel.modifyCtrl2 = false;
-            drawRightMidLeftPanel("redraw");
+            drawRightMidLeftPanel();
             drawRightMidRightPanel();
             drawRightBotPanel();
             redrawMap();
@@ -619,30 +621,30 @@ function drawRightUpPanel() {
     }
 }
 
-function drawRightMidLeftPanel(visit) {
-    if (visit === "redraw") return redraw();
+function drawRightMidLeftPanel() {
+    if (drawRightMidLeftPanel.canvas === undefined) {
+        drawRightMidLeftPanel.canvas = document.createElement("canvas");
+        drawRightMidLeftPanel.canvas.width = 300;
+        drawRightMidLeftPanel.canvas.height = 300;
+        drawRightMidLeftPanel.ctx = drawRightMidLeftPanel.canvas.getContext("2d");
+        let cBox = document.getElementById("right-mid-left-panel");
+        cBox.appendChild(drawRightMidLeftPanel.canvas);
 
-    drawRightMidLeftPanel.canvas = document.createElement("canvas");
-    drawRightMidLeftPanel.canvas.width = 300;
-    drawRightMidLeftPanel.canvas.height = 300;
-    drawRightMidLeftPanel.ctx = drawRightMidLeftPanel.canvas.getContext("2d");
-    let cBox = document.getElementById("right-mid-left-panel");
-    cBox.appendChild(drawRightMidLeftPanel.canvas);
-
-    // if (drawRightMidLeftPanel.selected === undefined) drawRightMidLeftPanel.selected = "";
-    drawRightMidLeftPanel.canvas.addEventListener("mousemove", (event) => {
-        let clicked = false;
-        for (const arc of drawRightMidLeftPanel.arcs) {
-            if (drawRightMidLeftPanel.ctx.isPointInPath(arc, event.offsetX, event.offsetY) && typeSelected.filterType !== arc.reason) {
-                typeSelected.filterType = arc.reason;
-                clicked = true;
-                break;
+        // if (drawRightMidLeftPanel.selected === undefined) drawRightMidLeftPanel.selected = "";
+        drawRightMidLeftPanel.canvas.addEventListener("mousemove", (event) => {
+            let clicked = false;
+            for (const arc of drawRightMidLeftPanel.arcs) {
+                if (drawRightMidLeftPanel.ctx.isPointInPath(arc, event.offsetX, event.offsetY) && typeSelected.filterType !== arc.reason) {
+                    typeSelected.filterType = arc.reason;
+                    clicked = true;
+                    break;
+                }
             }
-        }
-        if (!clicked) typeSelected.filterType = "";
+            if (!clicked) typeSelected.filterType = "";
 
-        redraw();
-    });
+            redraw();
+        });
+    }
 
     function getColor(reason) {
         let scheme = {
@@ -706,7 +708,7 @@ function drawRightMidLeftPanel(visit) {
 
         let count_reason = {}
         for (const fireElement of fire) {
-            if (inTimePeriod(fireElement)) {
+            if (inTimePeriod(fireElement) && fireSelected(fireElement)) {
                 if (fireElement.type in count_reason) count_reason[fireElement.type] += 1;
                 else count_reason[fireElement.type] = 1;
             }
@@ -769,7 +771,7 @@ function drawRightMidLeftPanel(visit) {
 }
 
 function drawRightMidRightPanel() {
-    let data = fire.filter(inTimePeriod);
+    let data = fire.filter(inTimePeriod).filter(fireSelected);
     let points = [{
         type: 'parcoords',
         line: {
@@ -822,7 +824,7 @@ function drawRightMidRightPanel() {
         },
     };
 
-    Plotly.newPlot('right-mid-right-panel', points, layout, { displayModeBar: false });
+    Plotly.newPlot('right-mid-right-panel', points, layout, {displayModeBar: false});
 }
 
 function drawRightBotPanel() {
@@ -849,7 +851,7 @@ function drawRightBotPanel() {
 
     function linspace(start, stop) {
         const step = (stop - start) / 4;
-        return Array.from({ length: 5 }, (_, i) => start + step * i);
+        return Array.from({length: 5}, (_, i) => start + step * i);
     }
 
     let ticks = linspace(Math.min(...filtered_station.map(row => (row['time'].getTime()))), Math.max(...filtered_station.map(row => (row['time'].getTime()))));
@@ -920,5 +922,5 @@ function drawRightBotPanel() {
         },
     };
 
-    Plotly.newPlot('right-bot-panel', points, layout, { displayModeBar: false });
+    Plotly.newPlot('right-bot-panel', points, layout, {displayModeBar: false});
 }
