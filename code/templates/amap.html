@@ -104,7 +104,6 @@
 <script>
     let infoWindow, map, level = 12,
         center = {lng: 120.14325, lat: 30.281472}; // amap location
-    // center = {lat: 30.1706, lng: 119.866875};
 
     function mapFeatureClick(e) {
         if (!infoWindow) {
@@ -272,10 +271,10 @@
         zIndex: 300
     });
 
-    fireLayer.on("mouseover", mapFeatureClick);
+    fireLayer.on("click", mapFeatureClick);
 
     function display_fire() {
-        let display_fire_list = fire.filter(inTimePeriod).filter(fireSelectedByParcoords);
+        let display_fire_list = fire.filter(inTimePeriod).filter(typeSelected).filter(fireSelectedByParcoords);
         fireLayer.setData(display_fire_list, {lnglat: 'lnglat'});
         fireLayer.setOptions({
             unit: 'meter',

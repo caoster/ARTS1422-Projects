@@ -765,7 +765,7 @@ function drawRightMidLeftPanel(NoDrawRight = false) {
         drawRightMidLeftPanel.ctx.fillText(displayText[2], displayText[0], displayText[1] - 5);
         drawRightMidLeftPanel.ctx.fillText(displayText[3], displayText[0], displayText[1] + 15);
         drawRightMidLeftPanel.ctx.textAlign = "left";
-        redrawMap();
+        display_fire();
         if (!NoDrawRight) drawRightMidRightPanel();
         drawRightBotPanel(); /* In case of losing context */
     }
