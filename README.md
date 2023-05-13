@@ -1,44 +1,34 @@
 # ARTS1422-Projects
 
+## Guide on running the program
 
-# Step1
+Install the following packages for `python`:
 
-## 图1
+```
+flask
+matplotlib
+numpy
+pandas
+openpyxl
+```
 
-用fire里每一行数据作为一个点plot 在地图上，每个点都有一定的透明度，通过叠加产生的颜色深浅表示单位地区发生火灾次数和程度。用颜色区分不同起因的火灾。
+You will also need Internet connection and a browser to view the GUI
 
-## 图2
+## Guide on starting the server
 
-将每一次火灾与其对应时间的气温对应起来，做火灾次数-气温的 barchart
+First set `PROGRAM_DIR` to the root directory of contents
 
-## 图 3
+```
+cd $PROGRAM_DIR
+cd code
+python3 main.py
+```
 
-用 industry 里的数量和位置信息做企业分布图，scatter，每个点都有一定的透明度，通过叠加产生的颜色深浅表示单位地区企业数量，每个点都有自己的颜色，偏红表示注册资金越高，偏绿表示越低。
+The server starts successfully if you see something like:
 
-## 图 4
+```
+* Serving Flask app ***
+* Running on http://***:5000 (Press CTRL+C to quit)
+```
 
-用 population 里的数据绘制人口分布图，scatter，每个点都有一定的透明度，通过叠加产生的颜色深浅表示单位地区人口密度
-
-# Step2
-ddl：2023/04/01之前
-
-## 图1
-> 显示所有信息，包括火灾、人口、企业的地理位置信息和火灾、人口、企业、天气的时间信息。由此看出火灾和各个变量的时空关系。
-
-一个地图。
-用与 main.html 里 scatter 火灾数据点相同的方式 scatter 人口和企业数据。由于企业多一个注册资金变量，这个变量用每个点自己的颜色表示（偏红表示注册资金越高，偏绿表示越低）。
-人口和企业数据的点都可以分别用 ☑️ 选择显示与否。
-有一个选项☑️，选择以显示累计数据/动态数据，也就是显示所有数据叠加在一起的图还是某个时刻的数据。后者需要一个可拖动的时间轴，时间轴上有平均气温的柱状图📊数据。
-![](https://p.ipic.vip/21zq43.jpg)
-
-## 图 2
-> 显示火灾、人口、企业、天气之间的相关性，不考虑地理位置信息。由此看出火灾和各个变量的内容之间的关系。
-
-一个平行坐标图，火灾、人口、企业、天气四条轴。
-- 火灾从上到下分成各种成因
-- 人口从上到下按人口密度分布
-- 企业从上到下按注册资金分布
-- 天气从上到下按平均气温分布
-
-然后把每场火灾对应的四条轴上的点表示出来，连接四个点。
-*最好是有一个时间轴可以高光每一个时刻的四个点和三条线。
+Visit website `localhost:5000` on your browser.
