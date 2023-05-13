@@ -10,6 +10,7 @@ matplotlib
 numpy
 pandas
 openpyxl
+requests
 ```
 
 You will also need Internet connection and a browser to view the GUI
